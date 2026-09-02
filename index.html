@@ -565,12 +565,13 @@
         <div class="header-actions">
             <button class="btn-template-lib" onclick="openTemplateLib()">📖 6大题型模板库</button>
 
-            <!-- 👇 新增：层次拆解 JSON 专属载入按钮 👇 -->
-            <label for="hierarchyInput" class="upload-btn" style="background-color: var(--practical-color);">📑 载入补充数据 (层次JSON / 深度解析MD)</label>
-            <input type="file" id="hierarchyInput" accept=".json,.md,.txt" webkitdirectory directory multiple>
-
-            <label for="fileInput" class="upload-btn">📂 载入区模拟题库文件夹</label>
+            <!-- 1. 必须先载入基础题库 -->
+            <label for="fileInput" class="upload-btn">📂 1. 载入区模拟题库文件夹</label>
             <input type="file" id="fileInput" accept=".md,.txt,.json" webkitdirectory directory multiple>
+
+            <!-- 2. 再载入补充数据 -->
+            <label for="hierarchyInput" class="upload-btn" style="background-color: var(--practical-color);">📑 2. 载入补充数据 (深度解析/层次JSON)</label>
+            <input type="file" id="hierarchyInput" accept=".json,.md,.txt" webkitdirectory directory multiple>
         </div>
     </header>
 

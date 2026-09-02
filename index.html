@@ -44,6 +44,15 @@
         .btn-danger:hover { background: #b91c1c; }
         .btn-sm { padding: 6px 14px; font-size: 12px; }
 
+        /* 自动加载提示 */
+        .auto-load-hint {
+            background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46;
+            padding: 10px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;
+            display: none; align-items: center; gap: 8px;
+        }
+        .auto-load-hint.show { display: flex; }
+        .auto-load-hint.error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+
         /* 控制面板 */
         .control-panel { 
             background: white; padding: 16px 20px; border-radius: 10px; 
@@ -149,10 +158,17 @@
     <h1>🎧 英语精听练习工具（专业版）</h1>
     <p class="subtitle">支持前言偏移校准、单句循环、AB复读、键盘快捷键</p>
 
+    <!-- 自动加载状态提示 -->
+    <div class="auto-load-hint" id="autoLoadHint">
+        <span id="autoLoadIcon">⏳</span>
+        <span id="autoLoadText">正在自动加载同级目录文件...</span>
+    </div>
+
     <!-- 上传区 -->
     <div class="drop-zone" id="dropZone">
         <h3>📁 拖拽文件夹或文件到此处</h3>
         <p>系统会自动按文件名匹配音频与字幕（如 A4.mp3 ↔ A4.json）</p>
+        <p style="font-size:12px;color:#999;margin-top:8px;">💡 提示：也可在同级目录下放一个 <code>files.json</code> 清单实现自动加载</p>
         <div class="file-input-wrapper">
             <input type="file" id="folderUpload" webkitdirectory directory multiple>
             <button class="btn" onclick="document.getElementById('folderUpload').click()">📂 选择文件夹</button>
@@ -215,6 +231,9 @@
         const offsetInput = document.getElementById('offsetInput');
         const playStatus = document.getElementById('playStatus');
         const abStatus = document.getElementById('abStatus');
+        const autoLoadHint = document.getElementById('autoLoadHint');
+        const autoLoadIcon = document.getElementById('autoLoadIcon');
+        const autoLoadText = document.getElementById('autoLoadText');
 
         // 状态
         let fileMap = new Map();
@@ -227,6 +246,60 @@
         let pointB = null;          // AB复读终点
         let abLooping = false;
         let currentAudioBuffer = null; // 用于自动检测前言
+
+        // ========== 自动加载同级目录文件 ==========
+        async function autoLoadFromDirectory() {
+            autoLoadHint.classList.add('show');
+            
+            try {
+                // 尝试读取同级目录的 files.json 清单
+                const manifestRes = await fetch('./files.json', { cache: 'no-cache' });
+                if (!manifestRes.ok) {
+                    throw new Error('未找到 files.json');
+                }
+                
+                const names = await manifestRes.json();
+                const files = [];
+                let successCount = 0;
+                
+                for (const entry of names) {
+                    const base = entry.replace(/\.(mp3|json)$/i, '');
+                    try {
+                        const [mp3Res, jsonRes] = await Promise.all([
+                            fetch(`./${encodeURIComponent(base)}.mp3`),
+                            fetch(`./${encodeURIComponent(base)}.json`)
+                        ]);
+                        
+                        if (mp3Res.ok) {
+                            const blob = await mp3Res.blob();
+                            files.push(new File([blob], `${base}.mp3`, { type: blob.type || 'audio/mpeg' }));
+                        }
+                        if (jsonRes.ok) {
+                            const blob = await jsonRes.blob();
+                            files.push(new File([blob], `${base}.json`, { type: 'application/json' }));
+                        }
+                        if (mp3Res.ok && jsonRes.ok) successCount++;
+                    } catch (err) {
+                        console.warn(`Auto-load failed for ${base}:`, err);
+                    }
+                }
+                
+                if (files.length > 0) {
+                    processFiles(files);
+                    autoLoadIcon.textContent = '✅';
+                    autoLoadText.innerHTML = `已自动加载 <b>${successCount}</b> 组文件（来自 files.json）`;
+                    // 3秒后淡出提示
+                    setTimeout(() => { autoLoadHint.style.opacity = '0.6'; }, 3000);
+                } else {
+                    throw new Error('清单中的文件未能加载');
+                }
+            } catch (e) {
+                console.log('Auto-load info:', e.message);
+                autoLoadIcon.textContent = '💡';
+                autoLoadText.innerHTML = '自动加载未启用：同级目录下缺少 <code>files.json</code> 文件清单。请手动上传文件，或创建 files.json 实现自动加载。';
+                autoLoadHint.classList.add('error');
+            }
+        }
 
         // ========== 文件处理 ==========
         function processFiles(files) {
@@ -633,6 +706,9 @@
         });
         document.getElementById('folderUpload').addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
         document.getElementById('fileUpload').addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
+
+        // ========== 页面加载时自动执行 ==========
+        document.addEventListener('DOMContentLoaded', autoLoadFromDirectory);
     </script>
 </body>
 </html>

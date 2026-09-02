@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>英语精听练习工具 - 专业版</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            max-width: 960px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f0f2f5; 
+            line-height: 1.6;
+        }
+        h1 { font-size: 24px; margin-bottom: 8px; color: #1a1a1a; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 20px; }
+
+        /* 上传区 */
+        .drop-zone { 
+            border: 2px dashed #4a90d9; 
+            border-radius: 12px; 
+            padding: 32px; 
+            text-align: center; 
+            background: white; 
+            margin-bottom: 16px; 
+            transition: all 0.25s;
+        }
+        .drop-zone.dragover { background: #e8f4fd; border-color: #2563eb; transform: scale(1.01); }
+        .drop-zone h3 { margin: 0 0 8px 0; color: #2563eb; font-size: 18px; }
+        .drop-zone p { color: #888; margin: 4px 0; font-size: 13px; }
+        .file-input-wrapper input { display: none; }
+        .btn {
+            background: #2563eb; color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; cursor: pointer; font-size: 14px; margin: 4px;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #1d4ed8; }
+        .btn-secondary { background: #64748b; }
+        .btn-secondary:hover { background: #475569; }
+        .btn-success { background: #059669; }
+        .btn-success:hover { background: #047857; }
+        .btn-danger { background: #dc2626; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+        /* 控制面板 */
+        .control-panel { 
+            background: white; padding: 16px 20px; border-radius: 10px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 16px;
+            display: none;
+        }
+        .control-panel.active { display: block; }
+        .control-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+        .control-row:last-child { margin-bottom: 0; }
+        .control-label { font-size: 13px; color: #555; font-weight: 500; white-space: nowrap; }
+        .control-input {
+            padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px;
+            font-size: 13px; width: 80px; text-align: center;
+        }
+        .control-hint { font-size: 12px; color: #888; margin-left: 4px; }
+
+        /* 播放器 */
+        .audio-panel { 
+            background: white; padding: 16px 20px; border-radius: 10px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 16px;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .audio-title { font-size: 16px; font-weight: 600; margin-bottom: 10px; color: #1e293b; }
+        audio { width: 100%; height: 40px; }
+
+        /* 浮动控制条 */
+        .float-controls {
+            display: flex; align-items: center; gap: 8px; margin-top: 10px;
+            padding: 10px 14px; background: #f8fafc; border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .float-controls .status-badge {
+            font-size: 12px; padding: 3px 10px; border-radius: 20px;
+            background: #e2e8f0; color: #475569; font-weight: 500;
+        }
+        .float-controls .status-badge.looping { background: #dbeafe; color: #1e40af; }
+        .float-controls .status-badge.ab-mode { background: #dcfce7; color: #166534; }
+        .shortcut-hint { margin-left: auto; font-size: 11px; color: #94a3b8; }
+
+        /* 配对选择 */
+        .pair-selector { 
+            background: white; padding: 14px 18px; border-radius: 10px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 16px;
+            display: none;
+        }
+        .pair-selector.active { display: block; }
+        .pair-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .pair-tag {
+            background: #f1f5f9; padding: 5px 12px; border-radius: 16px;
+            cursor: pointer; font-size: 12px; border: 2px solid transparent;
+            transition: all 0.15s; color: #334155;
+        }
+        .pair-tag:hover { background: #e2e8f0; }
+        .pair-tag.active { background: #2563eb; color: white; border-color: #1d4ed8; }
+        .pair-tag.missing { opacity: 0.5; cursor: not-allowed; text-decoration: line-through; }
+        .stats { font-size: 13px; color: #64748b; margin-bottom: 8px; }
+
+        /* 句子 */
+        .sentence-box { 
+            padding: 14px 16px; margin: 8px 0; background: white; 
+            border-left: 3px solid #cbd5e1; border-radius: 6px; 
+            transition: all 0.2s; cursor: pointer; position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .sentence-box:hover { border-left-color: #94a3b8; background: #f8fafc; }
+        .sentence-box.active { 
+            border-left-color: #2563eb; background: #eff6ff; 
+            box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+        }
+        .sentence-box.ab-a { border-left-color: #059669; background: #f0fdf4; }
+        .sentence-box.ab-b { border-left-color: #dc2626; background: #fef2f2; }
+        .sentence-box.ab-range { background: #f0fdf4; }
+
+        .time-badge { 
+            display: inline-block; background: #f1f5f9; color: #64748b;
+            padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px;
+            font-family: 'SF Mono', monospace;
+        }
+        .en-text { font-size: 1.15em; font-weight: 500; margin-bottom: 4px; color: #0f172a; line-height: 1.5; }
+        .zh-text { color: #64748b; font-size: 0.92em; line-height: 1.5; }
+        .keyword { color: #dc2626; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+
+        .sentence-actions {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            display: none; gap: 4px;
+        }
+        .sentence-box:hover .sentence-actions { display: flex; }
+        .icon-btn {
+            width: 28px; height: 28px; border-radius: 6px; border: 1px solid #e2e8f0;
+            background: white; cursor: pointer; font-size: 13px; display: flex;
+            align-items: center; justify-content: center; color: #64748b;
+        }
+        .icon-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .icon-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+
+        /* 空状态 */
+        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+    <h1>🎧 英语精听练习工具（专业版）</h1>
+    <p class="subtitle">支持前言偏移校准、单句循环、AB复读、键盘快捷键</p>
+
+    <!-- 上传区 -->
+    <div class="drop-zone" id="dropZone">
+        <h3>📁 拖拽文件夹或文件到此处</h3>
+        <p>系统会自动按文件名匹配音频与字幕（如 A4.mp3 ↔ A4.json）</p>
+        <div class="file-input-wrapper">
+            <input type="file" id="folderUpload" webkitdirectory directory multiple>
+            <button class="btn" onclick="document.getElementById('folderUpload').click()">📂 选择文件夹</button>
+            <input type="file" id="fileUpload" multiple accept=".mp3,.json,audio/mp3,application/json">
+            <button class="btn btn-secondary" onclick="document.getElementById('fileUpload').click()">📄 选择多个文件</button>
+        </div>
+    </div>
+
+    <!-- 配对选择 -->
+    <div class="pair-selector" id="pairSelector">
+        <div class="stats" id="stats"></div>
+        <div class="pair-list" id="pairList"></div>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="control-panel" id="controlPanel">
+        <div class="control-row">
+            <span class="control-label">⏱️ 前言偏移（秒）:</span>
+            <input type="number" class="control-input" id="offsetInput" value="0" step="0.1">
+            <button class="btn btn-sm btn-success" id="btnAutoDetect">🔍 自动检测</button>
+            <button class="btn btn-sm btn-secondary" id="btnApplyOffset">应用</button>
+            <button class="btn btn-sm" id="btnOffset20" style="background:#7c3aed;color:#fff">延后20秒</button>
+            <span class="control-hint">正值 = 延后，负值 = 提前；用于校准字幕与音频的同步</span>
+        </div>
+        <div class="control-row">
+            <span class="control-label">🔁 播放模式:</span>
+            <button class="btn btn-sm" id="btnLoop">单句循环: 关</button>
+            <button class="btn btn-sm btn-secondary" id="btnSetA">标记 A</button>
+            <button class="btn btn-sm btn-secondary" id="btnSetB">标记 B</button>
+            <button class="btn btn-sm btn-danger" id="btnClearAB">清除 AB</button>
+            <span class="control-hint" id="abStatus">AB复读: 未设置</span>
+        </div>
+    </div>
+
+    <!-- 播放器 -->
+    <div class="audio-panel" id="audioPanel" style="display:none;">
+        <div class="audio-title" id="currentTitle">请加载音频</div>
+        <audio id="audioPlayer" controls></audio>
+        <div class="float-controls">
+            <span class="status-badge" id="playStatus">就绪</span>
+            <span class="shortcut-hint">快捷键: 空格=播放/暂停 | L=循环 | A/B=标记 | ←→=±5秒</span>
+        </div>
+    </div>
+
+    <!-- 字幕容器 -->
+    <div id="subtitleContainer">
+        <div class="empty-state">👆 请先上传音频和JSON文件</div>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const subtitleContainer = document.getElementById('subtitleContainer');
+        const dropZone = document.getElementById('dropZone');
+        const pairSelector = document.getElementById('pairSelector');
+        const pairList = document.getElementById('pairList');
+        const stats = document.getElementById('stats');
+        const audioPanel = document.getElementById('audioPanel');
+        const currentTitle = document.getElementById('currentTitle');
+        const controlPanel = document.getElementById('controlPanel');
+        const offsetInput = document.getElementById('offsetInput');
+        const playStatus = document.getElementById('playStatus');
+        const abStatus = document.getElementById('abStatus');
+
+        // 状态
+        let fileMap = new Map();
+        let rawSubtitles = [];      // 原始JSON数据
+        let displaySubtitles = [];  // 应用偏移后的数据
+        let currentPairName = '';
+        let offset = 0;
+        let loopMode = false;       // 单句循环
+        let pointA = null;          // AB复读起点
+        let pointB = null;          // AB复读终点
+        let abLooping = false;
+        let currentAudioBuffer = null; // 用于自动检测前言
+
+        // ========== 文件处理 ==========
+        function processFiles(files) {
+            const audioFiles = [];
+            const jsonFiles = [];
+
+            for (const file of files) {
+                const name = file.name.toLowerCase();
+                if (name.endsWith('.mp3') || file.type.startsWith('audio/')) {
+                    audioFiles.push(file);
+                } else if (name.endsWith('.json') || file.type === 'application/json') {
+                    jsonFiles.push(file);
+                }
+            }
+
+            audioFiles.forEach(file => {
+                const base = file.name.replace(/\.[^/.]+$/, '');
+                if (!fileMap.has(base)) fileMap.set(base, {});
+                fileMap.get(base).mp3 = file;
+            });
+
+            jsonFiles.forEach(file => {
+                const base = file.name.replace(/\.[^/.]+$/, '');
+                if (!fileMap.has(base)) fileMap.set(base, {});
+                fileMap.get(base).json = file;
+            });
+
+            renderPairs();
+        }
+
+        function renderPairs() {
+            pairList.innerHTML = '';
+            let matched = 0, audioOnly = 0, jsonOnly = 0;
+
+            fileMap.forEach((val, name) => {
+                const hasAudio = !!val.mp3;
+                const hasJson = !!val.json;
+                const tag = document.createElement('span');
+                tag.className = 'pair-tag';
+
+                if (hasAudio && hasJson) {
+                    tag.textContent = name;
+                    tag.dataset.name = name;
+                    tag.onclick = () => loadPair(name);
+                    matched++;
+                } else if (hasAudio) {
+                    tag.textContent = name + ' (缺JSON)';
+                    tag.classList.add('missing');
+                    audioOnly++;
+                } else {
+                    tag.textContent = name + ' (缺MP3)';
+                    tag.classList.add('missing');
+                    jsonOnly++;
+                }
+                pairList.appendChild(tag);
+            });
+
+            stats.innerHTML = `找到 <b>${fileMap.size}</b> 组文件： <b style="color:#059669">${matched}</b> 组已匹配 | <b style="color:#dc2626">${audioOnly + jsonOnly}</b> 组不完整`;
+
+            if (matched > 0) {
+                pairSelector.classList.add('active');
+                const firstMatch = Array.from(fileMap.entries()).find(([_, v]) => v.mp3 && v.json);
+                if (firstMatch && !currentPairName) loadPair(firstMatch[0]);
+            }
+        }
+
+        async function loadPair(name) {
+            const pair = fileMap.get(name);
+            if (!pair || !pair.mp3 || !pair.json) return;
+
+            currentPairName = name;
+            offset = 0;
+            offsetInput.value = 0;
+            pointA = null; pointB = null; abLooping = false; loopMode = false;
+            updateABStatus(); updateLoopBtn();
+
+            document.querySelectorAll('.pair-tag').forEach(t => {
+                t.classList.toggle('active', t.dataset.name === name);
+            });
+
+            // 加载音频
+            const audioUrl = URL.createObjectURL(pair.mp3);
+            audioPlayer.src = audioUrl;
+            audioPanel.style.display = 'block';
+            controlPanel.classList.add('active');
+            currentTitle.textContent = '▶️ ' + name;
+
+            // 解码音频用于自动检测前言
+            try {
+                const arrayBuffer = await pair.mp3.arrayBuffer();
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                currentAudioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            } catch(e) { currentAudioBuffer = null; }
+
+            // 加载JSON
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.sentences) {
+                        rawSubtitles = data.sentences;
+                    } else if (data.files && data.files[0] && data.files[0].sentences) {
+                        rawSubtitles = data.files[0].sentences;
+                    } else {
+                        throw new Error('无法识别JSON结构');
+                    }
+                    applyOffset();
+                } catch (error) {
+                    alert('JSON 解析失败: ' + error.message);
+                }
+            };
+            reader.readAsText(pair.json);
+        }
+
+        // ========== 前言偏移 ==========
+        function applyOffset() {
+            offset = parseFloat(offsetInput.value) || 0;
+            displaySubtitles = rawSubtitles.map(s => ({
+                start: (s.start || 0) + offset,
+                end: (s.end || 0) + offset,
+                en: s.en || '',
+                zh: s.zh || '',
+                keywords: s.keywords || []
+            }));
+            renderSubtitles();
+        }
+
+        offsetInput.addEventListener('change', applyOffset);
+        document.getElementById('btnApplyOffset').addEventListener('click', applyOffset);
+        document.getElementById('btnOffset20').addEventListener('click', () => {
+            offsetInput.value = 20;
+            applyOffset();
+        });
+        
+
+        // 自动检测前言：分析音频前5秒，找第一个超过阈值的点
+        document.getElementById('btnAutoDetect').addEventListener('click', () => {
+            if (!currentAudioBuffer) {
+                alert('音频尚未加载完成，请稍后再试');
+                return;
+            }
+            const threshold = 0.02; // 音量阈值
+            const data = currentAudioBuffer.getChannelData(0);
+            const sampleRate = currentAudioBuffer.sampleRate;
+            const maxSamples = Math.min(data.length, sampleRate * 5); // 只分析前5秒
+
+            let firstVoice = 0;
+            for (let i = 0; i < maxSamples; i++) {
+                if (Math.abs(data[i]) > threshold) {
+                    firstVoice = i / sampleRate;
+                    break;
+                }
+            }
+            // 稍微提前一点
+            firstVoice = Math.max(0, firstVoice - 0.1);
+            offsetInput.value = firstVoice.toFixed(1);
+            applyOffset();
+        });
+
+        // ========== 渲染字幕 ==========
+        function renderSubtitles() {
+            subtitleContainer.innerHTML = '';
+            displaySubtitles.forEach((sub, index) => {
+                let enHtml = sub.en;
+                (sub.keywords || []).forEach(kw => {
+                    const regex = new RegExp('\\b' + kw + '\\b', 'gi');
+                    enHtml = enHtml.replace(regex, '<span class="keyword">$&</span>');
+                });
+
+                const div = document.createElement('div');
+                div.className = 'sentence-box';
+                div.id = 'sub-' + index;
+                div.dataset.index = index;
+                div.innerHTML = `
+                    <div class="en-text">
+                        <span class="time-badge">${fmt(sub.start)} - ${fmt(sub.end)}</span>
+                        ${enHtml}
+                    </div>
+                    <div class="zh-text">${sub.zh}</div>
+                    <div class="sentence-actions">
+                        <button class="icon-btn ${loopMode ? 'active' : ''}" title="循环本句" onclick="event.stopPropagation(); toggleLoop();">🔁</button>
+                        <button class="icon-btn ${pointA === index ? 'active' : ''}" title="设为A点" onclick="event.stopPropagation(); setPointA(${index});">A</button>
+                        <button class="icon-btn ${pointB === index ? 'active' : ''}" title="设为B点" onclick="event.stopPropagation(); setPointB(${index});">B</button>
+                    </div>
+                `;
+                div.onclick = () => playSentence(index);
+                subtitleContainer.appendChild(div);
+            });
+            updateABVisuals();
+        }
+
+        function fmt(s) {
+            const m = Math.floor(s / 60);
+            const sec = Math.floor(s % 60);
+            const ms = Math.floor((s % 1) * 10);
+            return m + ':' + sec.toString().padStart(2, '0') + '.' + ms;
+        }
+
+        // ========== 播放控制 ==========
+        function playSentence(index) {
+            const sub = displaySubtitles[index];
+            if (!sub) return;
+            const doSeekAndPlay = () => {
+                audioPlayer.currentTime = sub.start;
+                const onSeeked = () => {
+                    audioPlayer.removeEventListener('seeked', onSeeked);
+                    audioPlayer.play().catch(() => {});
+                };
+                audioPlayer.addEventListener('seeked', onSeeked);
+            };
+            if (audioPlayer.readyState >= 2) {
+                doSeekAndPlay();
+            } else {
+                audioPlayer.addEventListener('canplay', doSeekAndPlay, { once: true });
+            }
+        }
+
+        // 单句循环
+        document.getElementById('btnLoop').addEventListener('click', toggleLoop);
+        function toggleLoop() {
+            loopMode = !loopMode;
+            updateLoopBtn();
+            document.querySelectorAll('.icon-btn').forEach(btn => {
+                if (btn.textContent === '🔁') btn.classList.toggle('active', loopMode);
+            });
+        }
+        function updateLoopBtn() {
+            const btn = document.getElementById('btnLoop');
+            btn.textContent = loopMode ? '单句循环: 开' : '单句循环: 关';
+            btn.style.background = loopMode ? '#059669' : '#2563eb';
+            playStatus.textContent = loopMode ? '🔁 单句循环' : (abLooping ? '🔂 AB复读' : '播放中');
+            playStatus.className = 'status-badge' + (loopMode ? ' looping' : '');
+        }
+
+        // AB复读
+        document.getElementById('btnSetA').addEventListener('click', () => {
+            const idx = getCurrentSentenceIndex();
+            if (idx >= 0) setPointA(idx);
+        });
+        document.getElementById('btnSetB').addEventListener('click', () => {
+            const idx = getCurrentSentenceIndex();
+            if (idx >= 0) setPointB(idx);
+        });
+        document.getElementById('btnClearAB').addEventListener('click', clearAB);
+
+        function setPointA(index) {
+            pointA = index;
+            if (pointB !== null && pointB < pointA) pointB = null; // B不能在A前面
+            updateABStatus();
+            updateABVisuals();
+        }
+        function setPointB(index) {
+            if (pointA === null) { alert('请先设置A点'); return; }
+            if (index < pointA) { alert('B点必须在A点之后'); return; }
+            pointB = index;
+            abLooping = true;
+            updateABStatus();
+            updateABVisuals();
+            // 立即开始AB复读
+            playSentence(pointA);
+        }
+        function clearAB() {
+            pointA = null; pointB = null; abLooping = false;
+            updateABStatus();
+            updateABVisuals();
+        }
+        function updateABStatus() {
+            if (pointA === null) {
+                abStatus.textContent = 'AB复读: 未设置';
+            } else if (pointB === null) {
+                abStatus.textContent = 'AB复读: A=' + (pointA + 1) + ', B=未设置';
+            } else {
+                abStatus.textContent = 'AB复读: A=' + (pointA + 1) + ' → B=' + (pointB + 1);
+            }
+        }
+        function updateABVisuals() {
+            document.querySelectorAll('.sentence-box').forEach((el, i) => {
+                el.classList.remove('ab-a', 'ab-b', 'ab-range');
+                if (i === pointA) el.classList.add('ab-a');
+                if (i === pointB) el.classList.add('ab-b');
+                if (pointA !== null && pointB !== null && i > pointA && i < pointB) {
+                    el.classList.add('ab-range');
+                }
+            });
+            document.querySelectorAll('.icon-btn').forEach(btn => {
+                if (btn.textContent === 'A') btn.classList.toggle('active', false);
+                if (btn.textContent === 'B') btn.classList.toggle('active', false);
+            });
+            if (pointA !== null) {
+                const aEl = document.querySelector('#sub-' + pointA + ' .icon-btn:nth-child(2)');
+                if (aEl) aEl.classList.add('active');
+            }
+            if (pointB !== null) {
+                const bEl = document.querySelector('#sub-' + pointB + ' .icon-btn:nth-child(3)');
+                if (bEl) bEl.classList.add('active');
+            }
+        }
+
+        function getCurrentSentenceIndex() {
+            const t = audioPlayer.currentTime;
+            for (let i = 0; i < displaySubtitles.length; i++) {
+                if (t >= displaySubtitles[i].start && t <= displaySubtitles[i].end) return i;
+            }
+            // 找最接近的
+            let closest = 0, minDiff = Infinity;
+            for (let i = 0; i < displaySubtitles.length; i++) {
+                const diff = Math.abs(t - displaySubtitles[i].start);
+                if (diff < minDiff) { minDiff = diff; closest = i; }
+            }
+            return closest;
+        }
+
+        // ========== 时间同步 ==========
+        let lastActiveIndex = -1;
+        audioPlayer.addEventListener('timeupdate', () => {
+            const t = audioPlayer.currentTime;
+            let activeIndex = -1;
+
+            for (let i = 0; i < displaySubtitles.length; i++) {
+                const el = document.getElementById('sub-' + i);
+                if (!el) continue;
+                if (t >= displaySubtitles[i].start && t <= displaySubtitles[i].end) {
+                    el.classList.add('active');
+                    activeIndex = i;
+                } else {
+                    el.classList.remove('active');
+                }
+            }
+
+            if (activeIndex >= 0 && activeIndex !== lastActiveIndex) {
+                const el = document.getElementById('sub-' + activeIndex);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                lastActiveIndex = activeIndex;
+            }
+
+            // 单句循环检测
+            if (loopMode && activeIndex >= 0) {
+                const sub = displaySubtitles[activeIndex];
+                const duration = sub.end - sub.start;
+                // 只有句子长度大于 0.3 秒才触发循环，避免极短句子的边界问题
+                if (duration > 0.3 && t >= sub.end - 0.15) {
+                    audioPlayer.currentTime = sub.start;
+                }
+            }
+
+            // AB复读检测
+            if (abLooping && pointA !== null && pointB !== null) {
+                const endTime = displaySubtitles[pointB].end;
+                if (t >= endTime - 0.15) {
+                    audioPlayer.currentTime = displaySubtitles[pointA].start;
+                }
+            }
+        });
+
+        audioPlayer.addEventListener('play', () => {
+            playStatus.textContent = loopMode ? '🔁 单句循环' : (abLooping ? '🔂 AB复读' : '▶️ 播放中');
+        });
+        audioPlayer.addEventListener('pause', () => {
+            playStatus.textContent = '⏸ 已暂停';
+        });
+
+        // ========== 键盘快捷键 ==========
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return; // 输入框内不触发
+
+            switch(e.code) {
+                case 'Space':
+                    e.preventDefault();
+                    if (audioPlayer.paused) audioPlayer.play(); else audioPlayer.pause();
+                    break;
+                case 'KeyL':
+                    toggleLoop();
+                    break;
+                case 'KeyA':
+                    if (!e.ctrlKey && !e.metaKey) {
+                        const idx = getCurrentSentenceIndex();
+                        if (idx >= 0) setPointA(idx);
+                    }
+                    break;
+                case 'KeyB':
+                    if (!e.ctrlKey && !e.metaKey) {
+                        const idx = getCurrentSentenceIndex();
+                        if (idx >= 0) setPointB(idx);
+                    }
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 5);
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + 5);
+                    break;
+            }
+        });
+
+        // ========== 拖拽上传 ==========
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            processFiles(Array.from(e.dataTransfer.files));
+        });
+        document.getElementById('folderUpload').addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
+        document.getElementById('fileUpload').addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
+    </script>
+</body>
+</html>

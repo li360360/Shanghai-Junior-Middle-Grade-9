@@ -1,0 +1,229 @@
+{
+  "audio_file": "03 Unit 1 A3-2.mp3",
+  "sentences": [
+    {
+      "start": 0.0,
+      "end": 2.5,
+      "en": "Welcome to the Teen Helpline.",
+      "zh": "欢迎来到青少年热线。",
+      "keywords": ["Teen Helpline"]
+    },
+    {
+      "start": 2.5,
+      "end": 4.0,
+      "en": "I'm Professor Young.",
+      "zh": "我是杨教授。",
+      "keywords": ["Professor Young"]
+    },
+    {
+      "start": 4.0,
+      "end": 6.0,
+      "en": "How can I help you today?",
+      "zh": "今天我能怎么帮你？",
+      "keywords": ["help"]
+    },
+    {
+      "start": 6.0,
+      "end": 7.5,
+      "en": "Hi, I'm Alex.",
+      "zh": "你好，我是亚历克斯。",
+      "keywords": ["Alex"]
+    },
+    {
+      "start": 7.5,
+      "end": 10.0,
+      "en": "I'm feeling really down these days.",
+      "zh": "这些天我感觉很低落。",
+      "keywords": ["feeling down"]
+    },
+    {
+      "start": 10.0,
+      "end": 12.5,
+      "en": "I've got a lot of pimples on my face.",
+      "zh": "我脸上长了很多痘痘。",
+      "keywords": ["pimples"]
+    },
+    {
+      "start": 12.5,
+      "end": 14.0,
+      "en": "It's so embarrassing.",
+      "zh": "太尴尬了。",
+      "keywords": ["embarrassing"]
+    },
+    {
+      "start": 14.0,
+      "end": 17.5,
+      "en": "I'm afraid others will notice them and think I'm ugly.",
+      "zh": "我担心别人会注意到它们，觉得我很丑。",
+      "keywords": ["notice", "ugly"]
+    },
+    {
+      "start": 17.5,
+      "end": 19.0,
+      "en": "Don't worry, Alex.",
+      "zh": "别担心，亚历克斯。",
+      "keywords": ["worry"]
+    },
+    {
+      "start": 19.0,
+      "end": 22.0,
+      "en": "It's normal for teens to have pimples.",
+      "zh": "青少年长痘痘是正常的。",
+      "keywords": ["normal", "teens"]
+    },
+    {
+      "start": 22.0,
+      "end": 25.0,
+      "en": "Changes in your body can cause this.",
+      "zh": "你身体的变化会导致这种情况。",
+      "keywords": ["body", "changes"]
+    },
+    {
+      "start": 25.0,
+      "end": 30.5,
+      "en": "Wash your face gently, avoid fried or spicy food, and use some cream for the pimples.",
+      "zh": "轻柔地洗脸，避免油炸或辛辣食物，并涂一些祛痘霜。",
+      "keywords": ["wash", "cream"]
+    },
+    {
+      "start": 30.5,
+      "end": 34.0,
+      "en": "It's just a part of growing up, and people will understand.",
+      "zh": "这只是成长的一部分，人们会理解的。",
+      "keywords": ["growing up", "understand"]
+    },
+    {
+      "start": 34.0,
+      "end": 36.0,
+      "en": "Hello, Professor Young.",
+      "zh": "你好，杨教授。",
+      "keywords": ["Professor Young"]
+    },
+    {
+      "start": 36.0,
+      "end": 37.5,
+      "en": "I'm Susie.",
+      "zh": "我是苏西。",
+      "keywords": ["Susie"]
+    },
+    {
+      "start": 37.5,
+      "end": 40.5,
+      "en": "I'm having trouble making friends at the moment.",
+      "zh": "我目前在交朋友方面遇到了困难。",
+      "keywords": ["trouble", "friends"]
+    },
+    {
+      "start": 40.5,
+      "end": 42.5,
+      "en": "I often feel left out.",
+      "zh": "我经常感到被冷落。",
+      "keywords": ["left out"]
+    },
+    {
+      "start": 42.5,
+      "end": 44.0,
+      "en": "Hi, Susie.",
+      "zh": "你好，苏西。",
+      "keywords": ["Susie"]
+    },
+    {
+      "start": 44.0,
+      "end": 50.5,
+      "en": "You know, it's completely normal to feel this way, and you are not alone in experiencing these challenges.",
+      "zh": "你知道，有这样的感觉是完全正常的，你并不是唯一经历这些挑战的人。",
+      "keywords": ["normal", "challenges"]
+    },
+    {
+      "start": 50.5,
+      "end": 55.0,
+      "en": "Building new connections and finding people with similar interests may help.",
+      "zh": "建立新的联系，找到有相似兴趣的人可能会有帮助。",
+      "keywords": ["connections", "interests"]
+    },
+    {
+      "start": 55.0,
+      "end": 58.5,
+      "en": "Have you thought about joining a club or a community group?",
+      "zh": "你有没有想过加入一个俱乐部或社区团体？",
+      "keywords": ["club", "community"]
+    },
+    {
+      "start": 58.5,
+      "end": 62.0,
+      "en": "That could be a great way to meet like-minded people.",
+      "zh": "那可能是结识志同道合的人的好方法。",
+      "keywords": ["like-minded"]
+    },
+    {
+      "start": 62.0,
+      "end": 64.0,
+      "en": "Hi, Professor Young.",
+      "zh": "你好，杨教授。",
+      "keywords": ["Professor Young"]
+    },
+    {
+      "start": 64.0,
+      "end": 65.5,
+      "en": "My name is Jordan.",
+      "zh": "我的名字是乔丹。",
+      "keywords": ["Jordan"]
+    },
+    {
+      "start": 65.5,
+      "end": 68.0,
+      "en": "I'm struggling with peer pressure.",
+      "zh": "我正在与同伴压力作斗争。",
+      "keywords": ["peer pressure"]
+    },
+    {
+      "start": 68.0,
+      "end": 72.5,
+      "en": "My friends want me to skip class or do things I'm not OK with.",
+      "zh": "我的朋友们想让我逃课或做我不愿意做的事情。",
+      "keywords": ["skip class"]
+    },
+    {
+      "start": 72.5,
+      "end": 76.5,
+      "en": "I feel caught between fitting in and staying true to myself.",
+      "zh": "我感觉夹在融入群体和忠于自己之间。",
+      "keywords": ["fitting in", "true"]
+    },
+    {
+      "start": 76.5,
+      "end": 78.0,
+      "en": "Hi, Jordan.",
+      "zh": "你好，乔丹。",
+      "keywords": ["Jordan"]
+    },
+    {
+      "start": 78.0,
+      "end": 82.5,
+      "en": "Peer pressure is tough, but staying true to yourself is the most important.",
+      "zh": "同伴压力很艰难，但忠于自己是最重要的。",
+      "keywords": ["tough", "important"]
+    },
+    {
+      "start": 82.5,
+      "end": 85.5,
+      "en": "Have you talked to your friends about how you feel?",
+      "zh": "你和你的朋友们谈过你的感受吗？",
+      "keywords": ["talked", "feel"]
+    },
+    {
+      "start": 85.5,
+      "end": 89.0,
+      "en": "I'm afraid they'll judge me or stop being my friends.",
+      "zh": "我担心他们会评判我或不再做我的朋友。",
+      "keywords": ["judge", "friends"]
+    },
+    {
+      "start": 89.0,
+      "end": 93.5,
+      "en": "Remember, true friends will respect your choices and support your values.",
+      "zh": "记住，真正的朋友会尊重你的选择并支持你的价值观。",
+      "keywords": ["respect", "values"]
+    }
+  ]
+}

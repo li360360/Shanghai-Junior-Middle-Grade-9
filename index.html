@@ -1,714 +1,1742 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>英语精听练习工具 - 专业版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>语文阅读全真模拟系统 · 考点模板与层次拆解双效合一版</title>
     <style>
+        :root {
+            --primary-color: #2b3a42;
+            --accent-color: #3f51b5;
+            --accent-hover: #303f9f;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-light: #757575;
+            --border-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --tag-bg: #e8eaf6;
+            --tag-color: #3f51b5;
+            --literary-color: #e91e63;
+            --literary-bg: #fce4ec;
+            --practical-color: #009688;
+            --practical-bg: #e0f2f1;
+        }
+
         * { box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            max-width: 960px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            background: #f0f2f5; 
-            line-height: 1.6;
-        }
-        h1 { font-size: 24px; margin-bottom: 8px; color: #1a1a1a; }
-        .subtitle { color: #666; font-size: 14px; margin-bottom: 20px; }
 
-        /* 上传区 */
-        .drop-zone { 
-            border: 2px dashed #4a90d9; 
-            border-radius: 12px; 
-            padding: 32px; 
-            text-align: center; 
-            background: white; 
-            margin-bottom: 16px; 
-            transition: all 0.25s;
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+            line-height: 1.8;
         }
-        .drop-zone.dragover { background: #e8f4fd; border-color: #2563eb; transform: scale(1.01); }
-        .drop-zone h3 { margin: 0 0 8px 0; color: #2563eb; font-size: 18px; }
-        .drop-zone p { color: #888; margin: 4px 0; font-size: 13px; }
-        .file-input-wrapper input { display: none; }
-        .btn {
-            background: #2563eb; color: white; border: none; padding: 10px 20px;
-            border-radius: 8px; cursor: pointer; font-size: 14px; margin: 4px;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: #1d4ed8; }
-        .btn-secondary { background: #64748b; }
-        .btn-secondary:hover { background: #475569; }
-        .btn-success { background: #059669; }
-        .btn-success:hover { background: #047857; }
-        .btn-danger { background: #dc2626; }
-        .btn-danger:hover { background: #b91c1c; }
-        .btn-sm { padding: 6px 14px; font-size: 12px; }
 
-        /* 自动加载提示 */
-        .auto-load-hint {
-            background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46;
-            padding: 10px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px;
-            display: none; align-items: center; gap: 8px;
-        }
-        .auto-load-hint.show { display: flex; }
-        .auto-load-hint.error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+        .container { max-width: 1500px; margin: 0 auto; }
 
-        /* 控制面板 */
-        .control-panel { 
-            background: white; padding: 16px 20px; border-radius: 10px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 16px;
+        /* 顶部导航 */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 12px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 { color: var(--primary-color); margin: 0; font-size: 20px; }
+
+        .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+        .upload-btn {
+            background-color: var(--accent-color); color: white;
+            padding: 8px 18px; border-radius: 6px; cursor: pointer;
+            font-weight: bold; font-size: 13px;
+        }
+        .upload-btn:hover { background-color: var(--accent-hover); }
+        input[type="file"] { display: none; }
+
+        .btn-template-lib {
+            background-color: var(--warning-color); color: white;
+            padding: 8px 16px; border-radius: 6px; cursor: pointer;
+            font-weight: bold; font-size: 13px; border: none;
+        }
+
+        /* 四种意识横幅 */
+        .awareness-banner {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 5px solid #2196f3;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
             display: none;
         }
-        .control-panel.active { display: block; }
-        .control-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
-        .control-row:last-child { margin-bottom: 0; }
-        .control-label { font-size: 13px; color: #555; font-weight: 500; white-space: nowrap; }
-        .control-input {
-            padding: 6px 10px; border: 1px solid #d1d5db; border-radius: 6px;
-            font-size: 13px; width: 80px; text-align: center;
+        .awareness-banner.show { display: block; animation: fadeIn 0.5s; }
+        .awareness-title { font-weight: bold; color: #1565c0; margin-bottom: 8px; font-size: 15px; }
+        .awareness-steps { display: flex; gap: 12px; flex-wrap: wrap; }
+        .awareness-step {
+            background: white; padding: 6px 12px;
+            border-radius: 20px; font-size: 13px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .control-hint { font-size: 12px; color: #888; margin-left: 4px; }
+        .awareness-step .num {
+            display: inline-block; width: 20px; height: 20px;
+            background: #2196f3; color: white;
+            border-radius: 50%; text-align: center;
+            line-height: 20px; font-size: 11px; margin-right: 4px;
+        }
 
-        /* 播放器 */
-        .audio-panel { 
-            background: white; padding: 16px 20px; border-radius: 10px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 16px;
-            position: sticky; top: 0; z-index: 100;
+        /* 仪表盘 */
+        #dashboard-section {
+            background: var(--card-bg); padding: 25px;
+            border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 15px; display: none;
+            animation: fadeIn 0.5s;
         }
-        .audio-title { font-size: 16px; font-weight: 600; margin-bottom: 10px; color: #1e293b; }
-        audio { width: 100%; height: 40px; }
 
-        /* 浮动控制条 */
-        .float-controls {
-            display: flex; align-items: center; gap: 8px; margin-top: 10px;
-            padding: 10px 14px; background: #f8fafc; border-radius: 8px;
-            border: 1px solid #e2e8f0;
+        /* ===== 大类统计面板 ===== */
+        .category-overview {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed var(--border-color);
+            flex-wrap: wrap;
         }
-        .float-controls .status-badge {
-            font-size: 12px; padding: 3px 10px; border-radius: 20px;
-            background: #e2e8f0; color: #475569; font-weight: 500;
-        }
-        .float-controls .status-badge.looping { background: #dbeafe; color: #1e40af; }
-        .float-controls .status-badge.ab-mode { background: #dcfce7; color: #166534; }
-        .shortcut-hint { margin-left: auto; font-size: 11px; color: #94a3b8; }
 
-        /* 配对选择 */
-        .pair-selector { 
-            background: white; padding: 14px 18px; border-radius: 10px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08); margin-bottom: 16px;
-            display: none;
+        .category-card {
+            flex: 1;
+            min-width: 280px;
+            padding: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .pair-selector.active { display: block; }
-        .pair-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-        .pair-tag {
-            background: #f1f5f9; padding: 5px 12px; border-radius: 16px;
-            cursor: pointer; font-size: 12px; border: 2px solid transparent;
-            transition: all 0.15s; color: #334155;
+        .category-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
         }
-        .pair-tag:hover { background: #e2e8f0; }
-        .pair-tag.active { background: #2563eb; color: white; border-color: #1d4ed8; }
-        .pair-tag.missing { opacity: 0.5; cursor: not-allowed; text-decoration: line-through; }
-        .stats { font-size: 13px; color: #64748b; margin-bottom: 8px; }
+        .category-card.active {
+            box-shadow: 0 0 0 3px var(--accent-color), 0 8px 25px rgba(0,0,0,0.12);
+        }
+        .category-card.literary {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+            border: 1px solid #f48fb1;
+        }
+        .category-card.practical {
+            background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+            border: 1px solid #80cbc4;
+        }
+        .category-card .cat-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .category-card .cat-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .category-card.literary .cat-name { color: #c2185b; }
+        .category-card.practical .cat-name { color: #00695c; }
+        .category-card .cat-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .cat-stat-item {
+            text-align: center;
+        }
+        .cat-stat-item .cat-stat-num {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .category-card.literary .cat-stat-num { color: #c2185b; }
+        .category-card.practical .cat-stat-num { color: #00695c; }
+        .cat-stat-item .cat-stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .cat-percentage {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            opacity: 0.15;
+        }
+        .category-card .cat-hint {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+        .category-card.active .cat-hint {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
 
-        /* 句子 */
-        .sentence-box { 
-            padding: 14px 16px; margin: 8px 0; background: white; 
-            border-left: 3px solid #cbd5e1; border-radius: 6px; 
-            transition: all 0.2s; cursor: pointer; position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        .stats-overview {
+            display: flex; gap: 15px; margin-bottom: 25px;
+            padding-bottom: 15px; border-bottom: 1px dashed var(--border-color);
+            flex-wrap: wrap;
         }
-        .sentence-box:hover { border-left-color: #94a3b8; background: #f8fafc; }
-        .sentence-box.active { 
-            border-left-color: #2563eb; background: #eff6ff; 
-            box-shadow: 0 2px 8px rgba(37,99,235,0.12);
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            padding: 15px; border-radius: 8px; flex: 1; text-align: center;
+            min-width: 140px;
         }
-        .sentence-box.ab-a { border-left-color: #059669; background: #f0fdf4; }
-        .sentence-box.ab-b { border-left-color: #dc2626; background: #fef2f2; }
-        .sentence-box.ab-range { background: #f0fdf4; }
+        .stat-card h3 { margin: 0 0 8px 0; color: var(--text-light); font-size: 13px; }
+        .stat-card .num { font-size: 26px; font-weight: bold; color: var(--accent-color); }
 
-        .time-badge { 
-            display: inline-block; background: #f1f5f9; color: #64748b;
-            padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 8px;
-            font-family: 'SF Mono', monospace;
+        .filter-container h3 { margin-top: 0; color: var(--primary-color); font-size: 16px; }
+        .tags-cloud {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            margin-bottom: 20px;
         }
-        .en-text { font-size: 1.15em; font-weight: 500; margin-bottom: 4px; color: #0f172a; line-height: 1.5; }
-        .zh-text { color: #64748b; font-size: 0.92em; line-height: 1.5; }
-        .keyword { color: #dc2626; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+        .tag-checkbox { display: none; }
+        .tag-label {
+            padding: 6px 14px; background-color: var(--tag-bg); color: var(--tag-color);
+            border: 1px solid transparent; border-radius: 20px;
+            cursor: pointer; font-size: 13px; transition: all 0.2s; user-select: none;
+        }
+        .tag-label:hover { filter: brightness(0.95); }
+        .tag-checkbox:checked + .tag-label {
+            background-color: var(--accent-color); color: white;
+            box-shadow: 0 2px 8px rgba(63, 81, 181, 0.4);
+        }
+        .tag-count { font-size: 11px; opacity: 0.8; margin-left: 3px; }
 
-        .sentence-actions {
-            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-            display: none; gap: 4px;
+        .action-bar { text-align: center; margin-top: 15px; }
+        .btn-start {
+            background-color: var(--success-color); color: white;
+            padding: 12px 35px; border: none; border-radius: 30px;
+            font-size: 17px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
-        .sentence-box:hover .sentence-actions { display: flex; }
-        .icon-btn {
-            width: 28px; height: 28px; border-radius: 6px; border: 1px solid #e2e8f0;
-            background: white; cursor: pointer; font-size: 13px; display: flex;
-            align-items: center; justify-content: center; color: #64748b;
-        }
-        .icon-btn:hover { background: #f1f5f9; color: #0f172a; }
-        .icon-btn.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+        .btn-start:hover { transform: translateY(-2px); }
 
-        /* 空状态 */
-        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        /* 刷题区 */
+        #practice-section { display: none; animation: fadeIn 0.5s; }
+        .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+        .tab-btn {
+            padding: 7px 14px; border: 1px solid var(--border-color);
+            background-color: var(--card-bg); border-radius: 6px;
+            cursor: pointer; font-size: 13px; transition: all 0.2s;
+        }
+        .tab-btn.active, .tab-btn:hover {
+            background-color: var(--accent-color); color: white;
+            border-color: var(--accent-color);
+        }
+
+        .content-area { display: flex; gap: 15px; flex-direction: column; }
+        @media (min-width: 1200px) {
+            .content-area { flex-direction: row; }
+            .passage-section { flex: 3.5; }
+            .questions-section { flex: 3.5; }
+            .guide-section { flex: 3; }
+        }
+
+        .passage-section, .questions-section, .guide-panel {
+            background: var(--card-bg); padding: 20px;
+            border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px; margin-bottom: 12px;
+        }
+        .section-header h2 { margin: 0; font-size: 16px; color: var(--primary-color); }
+        .btn-back {
+            background: transparent; border: 1px solid var(--text-light);
+            color: var(--text-light); padding: 4px 10px;
+            border-radius: 4px; cursor: pointer; font-size: 12px;
+        }
+        .btn-back:hover { background: #f5f5f5; }
+
+        .passage-text { font-size: 15px; color: #2c3e50; text-align: justify; white-space: pre-wrap; }
+        mark { background-color: #fff3cd; padding: 0 3px; border-radius: 3px; }
+
+        /* 题目样式 */
+        .question-card {
+            margin-bottom: 25px; padding-bottom: 18px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .question-card:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .q-title { font-weight: bold; margin-bottom: 12px; font-size: 14px; white-space: pre-wrap; }
+        .q-tag {
+            display: inline-block; padding: 2px 8px; border-radius: 10px;
+            font-size: 11px; margin-right: 6px; font-weight: normal; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .q-tag:hover { transform: scale(1.05); }
+
+        .options-list { list-style: none; padding: 0; margin: 0 0 12px 0; }
+        .options-list li { margin-bottom: 8px; }
+        .options-list label {
+            cursor: pointer; display: flex; align-items: flex-start;
+            gap: 6px; padding: 5px 8px; border-radius: 4px; font-size: 14px;
+        }
+        .options-list label:hover { background-color: #f8f9fa; }
+
+        textarea.essay-input {
+            width: 100%; height: 90px; padding: 10px;
+            border: 1px solid var(--border-color); border-radius: 4px;
+            resize: vertical; font-family: inherit; font-size: 14px;
+        }
+
+        .btn-check {
+            width: 100%; padding: 10px; background-color: var(--accent-color);
+            color: white; border: none; border-radius: 6px;
+            font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 15px;
+        }
+
+        /* 解析区 */
+        .explanation-box {
+            display: none; margin-top: 12px; padding: 15px;
+            background-color: #f1f8e9;
+            border-left: 4px solid var(--success-color); border-radius: 4px;
+            font-size: 14px;
+        }
+        .explanation-box.show { display: block; animation: fadeIn 0.4s; }
+        .correct-ans { font-weight: bold; color: var(--success-color); margin-bottom: 8px; }
+
+        /* 模板拆解对照区 - 核心功能 */
+                
+        .compare-header {
+            padding: 10px 15px; font-weight: bold; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .compare-formula {
+            padding: 8px 15px; font-size: 13px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .compare-formula strong { color: var(--accent-color); }
+
+        .compare-body { padding: 12px 15px; }
+
+        .compare-step {
+            display: flex; gap: 12px; margin-bottom: 12px;
+            align-items: flex-start;
+        }
+        .compare-step:last-child { margin-bottom: 0; }
+
+        .step-number {
+            min-width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 13px;
+            flex-shrink: 0; margin-top: 2px;
+        }
+
+        .step-content { flex: 1; }
+        .step-template {
+            font-size: 13px; color: #555; margin-bottom: 6px;
+            padding: 6px 10px; border-radius: 4px; background: #fafafa;
+        }
+        .step-answer {
+            font-size: 13px; padding: 8px 12px; border-radius: 4px;
+            border-left: 3px solid var(--success-color);
+            background: #f9fbe7;
+        }
+        .step-answer-label {
+            font-size: 11px; color: var(--success-color);
+            font-weight: bold; margin-bottom: 3px;
+        }
+        .step-answer-text { color: #333; }
+        .step-answer-missing {
+            font-size: 12px; color: #999; font-style: italic;
+            padding: 6px; background: #f5f5f5; border-radius: 4px;
+        }
+
+        .compare-checklist {
+            margin-top: 12px; padding-top: 12px;
+            border-top: 1px dashed var(--border-color);
+        }
+        .compare-checklist h5 {
+            margin: 0 0 8px 0; font-size: 13px; color: var(--primary-color);
+        }
+        .check-item {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; margin-bottom: 5px; color: #555;
+        }
+        .check-item::before {
+            content: "☐"; color: var(--accent-color); font-size: 14px;
+        }
+
+        /* 右侧解题思路面板 */
+        .guide-panel {
+            position: sticky; top: 15px;
+            max-height: calc(100vh - 30px); overflow-y: auto;
+        }
+        .guide-panel h3 {
+            margin-top: 0; font-size: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px; color: var(--primary-color);
+        }
+
+        .thinking-flow {
+            background: #f5f5f5; padding: 12px;
+            border-radius: 6px; margin-bottom: 15px;
+        }
+        .thinking-flow h4 {
+            margin: 0 0 8px 0; color: var(--primary-color); font-size: 13px;
+        }
+        .flow-step {
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 5px; font-size: 12px;
+        }
+        .flow-step .arrow { color: var(--accent-color); font-weight: bold; }
+
+        .template-card {
+            padding: 12px; margin-bottom: 12px; border-radius: 6px;
+            font-size: 13px;
+        }
+        .template-card h4 {
+            margin: 0 0 6px 0; font-size: 14px;
+        }
+        .template-card .formula {
+            padding: 6px 10px; border-radius: 4px; margin: 6px 0;
+            font-weight: bold; font-size: 12px;
+        }
+        .template-card .steps-list {
+            margin: 8px 0; padding-left: 18px;
+        }
+        .template-card .steps-list li {
+            margin-bottom: 4px; font-size: 12px;
+        }
+        .template-card .tips {
+            font-size: 11px; margin-top: 6px; font-style: italic;
+            padding: 6px; border-radius: 4px;
+        }
+
+        .current-q-info {
+            padding: 10px; border-radius: 6px; margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .placeholder-state {
+            text-align: center; color: var(--text-light);
+            padding: 60px 0; font-size: 16px;
+        }
+
+        /* 弹窗 */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1000;
+            justify-content: center; align-items: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-content {
+            background: white; width: 92%; max-width: 1000px;
+            max-height: 88vh; border-radius: 12px; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .modal-header {
+            background: var(--accent-color); color: white;
+            padding: 12px 20px; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .modal-header h2 { margin: 0; font-size: 18px; }
+        .modal-close {
+            background: none; border: none; color: white;
+            font-size: 24px; cursor: pointer;
+        }
+        .modal-body { padding: 15px 20px; overflow-y: auto; flex: 1; }
+
+        .category-block {
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px; overflow: hidden;
+        }
+        .category-header {
+            padding: 10px 15px; font-weight: bold; font-size: 14px;
+            cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .subtype-list {
+            padding: 0 15px; max-height: 0; overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .subtype-list.open { max-height: 3000px; padding: 10px 15px; }
+        .subtype-item {
+            padding: 10px 12px; margin-bottom: 8px;
+            border-radius: 6px; background: #fafafa;
+            border-left: 3px solid var(--accent-color);
+        }
+        .subtype-item h5 { margin: 0 0 5px 0; color: var(--accent-color); font-size: 13px; }
+        .subtype-item .formula { font-size: 12px; font-weight: bold; margin: 5px 0; }
+        .subtype-item .steps { font-size: 12px; line-height: 1.8; color: #555; }
+        .subtype-item .tips { font-size: 11px; color: #888; font-style: italic; margin-top: 5px; }
+
+        /* 标签云区域遮罩 */
+        .tags-section-mask {
+            position: relative;
+        }
+        .tags-section-mask.locked::before {
+            content: "👆 请先点击上方选择一个大类";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--accent-color);
+            font-weight: bold;
+            z-index: 10;
+            border-radius: 8px;
+            backdrop-filter: blur(2px);
+        }
+        .tags-section-mask.locked {
+            min-height: 120px;
+        }
+
+        /* ===== 录音功能样式 ===== */
+.btn-audio {
+    padding: 6px 12px; border: none; border-radius: 6px;
+    font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s;
+}
+.btn-audio.record { background-color: var(--success-color); color: white; }
+.btn-audio.record:hover { background-color: #388e3c; }
+.btn-audio.delete { background-color: #f44336; color: white; }
+.btn-audio.delete:hover { background-color: #d32f2f; }
+.btn-audio.download { background-color: var(--accent-color); color: white; }
+.btn-audio.download:hover { background-color: var(--accent-hover); }
+
+/* 录音中的呼吸灯效果 */
+.recording-pulse {
+    animation: pulse 1.5s infinite;
+    background-color: #f44336 !important;
+}
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(244, 67, 54, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(244, 67, 54, 0); }
+}
+
+        /* ===== 智能解析高亮与互动样式 ===== */
+        .clickable-quote {
+            color: #d32f2f;
+            cursor: pointer;
+            border-bottom: 1px dashed #d32f2f;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        .clickable-quote:hover {
+            background-color: #ffebee;
+        }
+
+        /* 原文高亮：短词（关键词）标红 */
+        .hl-keyword {
+            color: #e53935;
+            font-weight: bold;
+            text-decoration: underline wavy #e53935;
+        }
+
+        /* 原文高亮：长句标黄底色 */
+        .hl-sentence {
+            background-color: #fff59d;
+            border-radius: 3px;
+            padding: 2px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
-<base target="_blank">
 </head>
 <body>
 
-    <h1>🎧 英语精听练习工具（专业版）</h1>
-    <p class="subtitle">支持前言偏移校准、单句循环、AB复读、键盘快捷键</p>
+<div class="container">
+    <header>
+        <h1>语文阅读全真模拟系统 <span style="color:#999;font-size:14px;">| 考点模板与层次拆解双效合一版</span></h1>
+        <div class="header-actions">
+            <button class="btn-template-lib" onclick="openTemplateLib()">📖 6大题型模板库</button>
 
-    <!-- 自动加载状态提示 -->
-    <div class="auto-load-hint" id="autoLoadHint">
-        <span id="autoLoadIcon">⏳</span>
-        <span id="autoLoadText">正在自动加载同级目录文件...</span>
-    </div>
+            <!-- 👇 新增：层次拆解 JSON 专属载入按钮 👇 -->
+            <label for="hierarchyInput" class="upload-btn" style="background-color: var(--practical-color);">📑 载入补充数据 (层次JSON / 深度解析MD)</label>
+            <input type="file" id="hierarchyInput" accept=".json,.md,.txt" webkitdirectory directory multiple>
 
-    <!-- 上传区 -->
-    <div class="drop-zone" id="dropZone">
-        <h3>📁 拖拽文件夹或文件到此处</h3>
-        <p>系统会自动按文件名匹配音频与字幕（如 A4.mp3 ↔ A4.json）</p>
-        <p style="font-size:12px;color:#999;margin-top:8px;">💡 提示：也可在同级目录下放一个 <code>files.json</code> 清单实现自动加载</p>
-        <div class="file-input-wrapper">
-            <input type="file" id="folderUpload" webkitdirectory directory multiple>
-            <button class="btn" onclick="document.getElementById('folderUpload').click()">📂 选择文件夹</button>
-            <input type="file" id="fileUpload" multiple accept=".mp3,.json,audio/mp3,application/json">
-            <button class="btn btn-secondary" onclick="document.getElementById('fileUpload').click()">📄 选择多个文件</button>
+            <label for="fileInput" class="upload-btn">📂 载入区模拟题库文件夹</label>
+            <input type="file" id="fileInput" accept=".md,.txt,.json" webkitdirectory directory multiple>
+        </div>
+    </header>
+
+    <!-- 四种意识横幅 -->
+    <div class="awareness-banner" id="awareness-banner">
+        <div class="awareness-title">🧭 阅读高分四意识 · 做题流程导航</div>
+        <div class="awareness-steps">
+            <div class="awareness-step"><span class="num">1</span><strong>文体意识</strong>：先辨文体，确定阅读重点</div>
+            <div class="awareness-step"><span class="num">2</span><strong>语境意识</strong>：字不离句，句不离段，段不离篇</div>
+            <div class="awareness-step"><span class="num">3</span><strong>文本意识</strong>：答案在文中，有理有据</div>
+            <div class="awareness-step"><span class="num">4</span><strong>题目意识</strong>：审清题意，明确答题方向</div>
         </div>
     </div>
 
-    <!-- 配对选择 -->
-    <div class="pair-selector" id="pairSelector">
-        <div class="stats" id="stats"></div>
-        <div class="pair-list" id="pairList"></div>
+    <!-- 初始占位符 -->
+    <div id="placeholder" class="placeholder-state">
+        📚 请点击右上角载入包含了各区阅读题 Markdown/JSON 的文件夹<br>
+        <span style="font-size:13px;color:#999;">系统将自动识别47种考点，匹配6大题型细分模板，并提供模板与答案的对照拆解以及文章层次的深度拆解。<br>
+        支持 .md / .txt / .json 格式，自动提取 ###分类：[分类名]\n体裁：[体裁名]### 标记。</span>
     </div>
 
-    <!-- 控制面板 -->
-    <div class="control-panel" id="controlPanel">
-        <div class="control-row">
-            <span class="control-label">⏱️ 前言偏移（秒）:</span>
-            <input type="number" class="control-input" id="offsetInput" value="0" step="0.1">
-            <button class="btn btn-sm btn-success" id="btnAutoDetect">🔍 自动检测</button>
-            <button class="btn btn-sm btn-secondary" id="btnApplyOffset">应用</button>
-            <button class="btn btn-sm" id="btnOffset20" style="background:#7c3aed;color:#fff">延后20秒</button>
-            <span class="control-hint">正值 = 延后，负值 = 提前；用于校准字幕与音频的同步</span>
+    <!-- 仪表盘 -->
+    <div id="dashboard-section">
+        <!-- 大类统计面板 -->
+        <div class="category-overview" id="category-overview">
+            <!-- 动态生成 -->
         </div>
-        <div class="control-row">
-            <span class="control-label">🔁 播放模式:</span>
-            <button class="btn btn-sm" id="btnLoop">单句循环: 关</button>
-            <button class="btn btn-sm btn-secondary" id="btnSetA">标记 A</button>
-            <button class="btn btn-sm btn-secondary" id="btnSetB">标记 B</button>
-            <button class="btn btn-sm btn-danger" id="btnClearAB">清除 AB</button>
-            <span class="control-hint" id="abStatus">AB复读: 未设置</span>
+
+        <div class="stats-overview">
+            <div class="stat-card"><h3>已解析文章总数</h3><div class="num" id="stat-articles">0</div></div>
+            <div class="stat-card"><h3>题库题目总数</h3><div class="num" id="stat-questions">0</div></div>
+            <div class="stat-card"><h3>题库总分值</h3><div class="num" id="stat-score">0</div></div>
+            <div class="stat-card"><h3>覆盖考点数量</h3><div class="num" id="stat-tags">0</div></div>
+        </div>
+
+        <div class="filter-container">
+            <h3>🎯 选择要专项突破的考点（支持多选）</h3>
+            <p style="color: #757575; font-size: 13px; margin-top: -5px;">
+                不勾选则默认进行全卷刷题。系统将根据47种考点自动匹配6大题型细分模板，并提供模板与答案的对照拆解。
+            </p>
+            <div class="tags-section-mask locked" id="tags-section-mask">
+                <div class="tags-cloud" id="tags-cloud-container"></div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn-start" onclick="startPractice()">生成专属试卷并开始刷题 🚀</button>
         </div>
     </div>
 
-    <!-- 播放器 -->
-    <div class="audio-panel" id="audioPanel" style="display:none;">
-        <div class="audio-title" id="currentTitle">请加载音频</div>
-        <audio id="audioPlayer" controls></audio>
-        <div class="float-controls">
-            <span class="status-badge" id="playStatus">就绪</span>
-            <span class="shortcut-hint">快捷键: 空格=播放/暂停 | L=循环 | A/B=标记 | ←→=±5秒</span>
+    <!-- 刷题区 -->
+    <div id="practice-section">
+        <div class="tabs" id="tab-container"></div>
+
+        <div class="content-area">
+            <!-- 左侧：文章 -->
+            <div class="passage-section">
+                <div class="section-header">
+                    <h2 id="passage-title">文章标题</h2>
+                    <!-- 录音控制区 -->
+                    <div id="audio-controls" style="display: flex; gap: 8px; align-items: center;">
+                        <button id="btn-record" class="btn-audio record" onclick="toggleRecording()">🎤 一键录音</button>
+                        <audio id="audio-playback" controls style="display: none; height: 30px;"></audio>
+                        <button id="btn-download-audio" class="btn-audio download" style="display: none;" onclick="downloadAudio()">💾 下载本地</button>
+                        <button id="btn-delete-audio" class="btn-audio delete" style="display: none;" onclick="deleteAudio()">🗑️ 删除录音</button>
+                    </div>
+                </div>
+                <div class="passage-text" id="passage-content"></div>
+            </div>
+
+            <!-- 中间：题目作答及层次拆解 -->
+            <div class="questions-section" id="questions-section">
+                <div class="section-header">
+                    <h2>实战作答</h2>
+                    <div>
+                        <button id="btn-toggle-hierarchy" style="display:none; background: var(--warning-color); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 10px;" onclick="toggleHierarchy()">📑 显示层次拆解</button>
+                        <button class="btn-back" onclick="backToDashboard()">🔙 返回考点大厅</button>
+                    </div>
+                </div>
+                <!-- 层次拆解容器 -->
+                <div id="hierarchy-container" style="display: none; margin-bottom: 20px;"></div>
+                <div id="questions-container"></div>
+                <button class="btn-check" onclick="showExplanations()">交卷 / 查看当前文章解析与模板拆解</button>
+            </div>
+
+            <!-- 右侧：解题思路面板 -->
+            <div class="guide-section">
+                <div class="guide-panel" id="guide-panel">
+                    <h3>🎯 当前题目 · 解题思路</h3>
+                    <div id="guide-content">
+                        <p style="color:#999;font-size:12px;">点击左侧题目考点标签，即可查看对应的细分题型模板和思路引导。</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
-    <!-- 字幕容器 -->
-    <div id="subtitleContainer">
-        <div class="empty-state">👆 请先上传音频和JSON文件</div>
+<!-- 模板库弹窗 -->
+<div class="modal-overlay" id="template-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📖 语文阅读 · 6大题型47种考点 · 答题模板库</h2>
+            <button class="modal-close" onclick="closeTemplateLib()">&times;</button>
+        </div>
+        <div class="modal-body" id="modal-body"></div>
     </div>
+</div>
 
-    <script>
-        const audioPlayer = document.getElementById('audioPlayer');
-        const subtitleContainer = document.getElementById('subtitleContainer');
-        const dropZone = document.getElementById('dropZone');
-        const pairSelector = document.getElementById('pairSelector');
-        const pairList = document.getElementById('pairList');
-        const stats = document.getElementById('stats');
-        const audioPanel = document.getElementById('audioPanel');
-        const currentTitle = document.getElementById('currentTitle');
-        const controlPanel = document.getElementById('controlPanel');
-        const offsetInput = document.getElementById('offsetInput');
-        const playStatus = document.getElementById('playStatus');
-        const abStatus = document.getElementById('abStatus');
-        const autoLoadHint = document.getElementById('autoLoadHint');
-        const autoLoadIcon = document.getElementById('autoLoadIcon');
-        const autoLoadText = document.getElementById('autoLoadText');
+<script>
+// ============================================================
+// 语文阅读 · 6大题型38种细分模板 · 47种考点映射 · 答题模板库
+// ============================================================
 
-        // 状态
-        let fileMap = new Map();
-        let rawSubtitles = [];      // 原始JSON数据
-        let displaySubtitles = [];  // 应用偏移后的数据
-        let currentPairName = '';
-        let offset = 0;
-        let loopMode = false;       // 单句循环
-        let pointA = null;          // AB复读起点
-        let pointB = null;          // AB复读终点
-        let abLooping = false;
-        let currentAudioBuffer = null; // 用于自动检测前言
+const TagMapping = {
+  "内容理解": { "category": "概括理解", "subtype": "内容理解", "formula": "定位原文 → 提取关键信息 → 整合归纳 → 分条作答" },
+  "概括内容": { "category": "概括理解", "subtype": "内容概括", "formula": "要素串联：时间+地点+人物+事件（起因→经过→结果）" },
+  "情节梳理": { "category": "概括理解", "subtype": "情节梳理", "formula": "开端 → 发展 → 高潮 → 结局" },
+  "内容梳理": { "category": "概括理解", "subtype": "内容概括", "formula": "分层梳理 → 提取要点 → 归纳整合" },
+  "思路梳理": { "category": "概括理解", "subtype": "思路梳理", "formula": "整体感知 → 分段概括 → 串联线索 → 提炼思路" },
+  "概念辨析": { "category": "概括理解", "subtype": "概念辨析", "formula": "界定概念 → 比较异同 → 分析联系 → 得出结论" },
+  "观点与事实辨析": { "category": "概括理解", "subtype": "辨析题", "formula": "明确对象 → 回归文本 → 对比分析 → 得出结论" },
+  "概念应用": { "category": "概括理解", "subtype": "概念应用", "formula": "理解概念 → 结合文本 → 举例验证 → 总结作用" },
+  "句子赏析": { "category": "词句赏析", "subtype": "句子赏析", "formula": "判手法 → 析内容 → 说效果 → 点情感" },
+  "词语含义": { "category": "词句赏析", "subtype": "词语含义", "formula": "本义 + 语境义 + 情感义/主旨义" },
+  "词语逻辑": { "category": "词句赏析", "subtype": "词语逻辑", "formula": "分析关系 → 理清层次 → 说明作用" },
+  "词语作用": { "category": "词句赏析", "subtype": "词语作用", "formula": "解词 → 语境分析 → 结构作用 → 情感表达" },
+  "修辞手法（比喻）": { "category": "词句赏析", "subtype": "修辞手法", "formula": "判手法 → 析运用 → 说效果 → 点情感" },
+  "修辞手法（排比）": { "category": "词句赏析", "subtype": "修辞手法", "formula": "判手法 → 析运用 → 说效果 → 点情感" },
+  "修辞手法（反复）": { "category": "词句赏析", "subtype": "修辞手法", "formula": "判手法 → 析运用 → 说效果 → 点情感" },
+  "比喻": { "category": "词句赏析", "subtype": "修辞手法", "formula": "判手法 → 析运用 → 说效果 → 点情感" },
+  "语言特色": { "category": "词句赏析", "subtype": "语言特色", "formula": "风格 + 用词 + 句式 + 修辞" },
+  "语言得体": { "category": "词句赏析", "subtype": "语言得体", "formula": "判语境 → 析身份 → 评表达 → 说效果" },
+  "表达方式": { "category": "词句赏析", "subtype": "表达方式", "formula": "判方式 → 析内容 → 说效果 → 联主旨" },
+  "段落作用": { "category": "作用分析", "subtype": "段落作用", "formula": "结构作用 + 内容作用 + 情感作用 + 读者效果" },
+  "标题作用": { "category": "作用分析", "subtype": "标题作用", "formula": "内容 + 结构 + 表达 + 深层义" },
+  "标题含义": { "category": "作用分析", "subtype": "标题含义", "formula": "表层义 → 深层义 → 情感义 → 主旨义" },
+  "首尾呼应": { "category": "作用分析", "subtype": "结构作用", "formula": "找呼应 → 析结构 → 说情感 → 点主题" },
+  "情节作用": { "category": "作用分析", "subtype": "情节作用", "formula": "对人物 → 对情节 → 对主题 → 对读者" },
+  "细节描写作用": { "category": "作用分析", "subtype": "细节描写作用", "formula": "判类型 → 析内容 → 说人物 → 联主题" },
+  "环境描写作用": { "category": "作用分析", "subtype": "环境描写作用", "formula": "交代→渲染→烘托→推动→暗示→深化" },
+  "衔接": { "category": "作用分析", "subtype": "过渡作用", "formula": "承上内容 → 启下内容 → 结构作用 → 情感连贯" },
+  "选材组材": { "category": "作用分析", "subtype": "选材组材", "formula": "选材特点 → 组材方式 → 详略安排 → 服务主旨" },
+  "论证结构": { "category": "作用分析", "subtype": "论证结构", "formula": "整体结构 → 段落关系 → 逻辑层次 → 论证效果" },
+  "中心论点": { "category": "作用分析", "subtype": "中心论点", "formula": "找位置 → 析表述 → 梳论据 → 明关系" },
+  "论据作用": { "category": "作用分析", "subtype": "论据作用", "formula": "判类型 → 析内容 → 说支撑 → 评说服力" },
+  "论证方法": { "category": "作用分析", "subtype": "论证方法", "formula": "判方法 → 析论据 → 说效果 → 点观点" },
+  "论证方法（排比）": { "category": "作用分析", "subtype": "论证方法", "formula": "判方法 → 析论据 → 说效果 → 点观点" },
+  "论证分析": { "category": "作用分析", "subtype": "论证分析", "formula": "梳论点 → 析论据 → 判方法 → 评效果" },
+  "观点论证": { "category": "作用分析", "subtype": "观点论证", "formula": "明观点 → 找论据 → 析论证 → 评说服力" },
+  "叙事视角": { "category": "作用分析", "subtype": "人称作用", "formula": "判人称 → 说效果 → 联情感" },
+  "写作手法": { "category": "写法技巧", "subtype": "写作手法", "formula": "构思 + 表达 + 选材 + 效果" },
+  "写作手法（虚实结合）": { "category": "写法技巧", "subtype": "表现手法", "formula": "判手法 → 析运用 → 说效果 → 联主旨" },
+  "主旨情感": { "category": "形象主旨", "subtype": "主旨概括", "formula": "内容 + 主旨 + 情感 + 思考" },
+  "主旨理解": { "category": "形象主旨", "subtype": "主旨概括", "formula": "内容 + 主旨 + 情感 + 思考" },
+  "人物形象": { "category": "形象主旨", "subtype": "人物形象", "formula": "事例 + 正面描写 + 侧面描写 + 时代背景" },
+  "人物形象（侧面描写）": { "category": "形象主旨", "subtype": "人物形象", "formula": "事例 + 正面描写 + 侧面描写 + 时代背景" },
+  "次要人物作用": { "category": "形象主旨", "subtype": "次要人物", "formula": "衬托 + 推动 + 揭示 + 线索" },
+  "应用": { "category": "开放探究", "subtype": "拓展运用", "formula": "扣原文 → 联实际 → 提建议 → 语言得体" },
+  "综合考点": { "category": "开放探究", "subtype": "综合分析", "formula": "审题 → 定位 → 多角度分析 → 整合作答" }
+};
 
-        // ========== 自动加载同级目录文件 ==========
-        async function autoLoadFromDirectory() {
-            autoLoadHint.classList.add('show');
-            
-            try {
-                // 尝试读取同级目录的 files.json 清单
-                const manifestRes = await fetch('./files.json', { cache: 'no-cache' });
-                if (!manifestRes.ok) {
-                    throw new Error('未找到 files.json');
-                }
-                
-                const names = await manifestRes.json();
-                const files = [];
-                let successCount = 0;
-                
-                for (const entry of names) {
-                    const base = entry.replace(/\.(mp3|json)$/i, '');
-                    try {
-                        const [mp3Res, jsonRes] = await Promise.all([
-                            fetch(`./${encodeURIComponent(base)}.mp3`),
-                            fetch(`./${encodeURIComponent(base)}.json`)
-                        ]);
-                        
-                        if (mp3Res.ok) {
-                            const blob = await mp3Res.blob();
-                            files.push(new File([blob], `${base}.mp3`, { type: blob.type || 'audio/mpeg' }));
-                        }
-                        if (jsonRes.ok) {
-                            const blob = await jsonRes.blob();
-                            files.push(new File([blob], `${base}.json`, { type: 'application/json' }));
-                        }
-                        if (mp3Res.ok && jsonRes.ok) successCount++;
-                    } catch (err) {
-                        console.warn(`Auto-load failed for ${base}:`, err);
-                    }
-                }
-                
-                if (files.length > 0) {
-                    processFiles(files);
-                    autoLoadIcon.textContent = '✅';
-                    autoLoadText.innerHTML = `已自动加载 <b>${successCount}</b> 组文件（来自 files.json）`;
-                    // 3秒后淡出提示
-                    setTimeout(() => { autoLoadHint.style.opacity = '0.6'; }, 3000);
-                } else {
-                    throw new Error('清单中的文件未能加载');
-                }
-            } catch (e) {
-                console.log('Auto-load info:', e.message);
-                autoLoadIcon.textContent = '💡';
-                autoLoadText.innerHTML = '自动加载未启用：同级目录下缺少 <code>files.json</code> 文件清单。请手动上传文件，或创建 files.json 实现自动加载。';
-                autoLoadHint.classList.add('error');
+const TemplateLibrary = {
+  "概括理解": {
+    "icon": "📋", "desc": "从文本中提取、整合关键信息", "color": "#e3f2fd", "borderColor": "#2196f3", "textColor": "#1565c0",
+    "subtypes": {
+      "内容理解": { "steps": ["定位题干关键词，回原文找对应段落", "提取关键信息，圈画重点词句", "整合归纳，去粗取精", "按分值分条作答，确保要点完整"], "checkPoints": ["定位准确", "提取完整", "整合得当", "分条清晰"], "tips": "答案一般在原文中，注意同义替换和概括提炼" },
+      "内容概括": { "steps": ["找出时间、地点、人物、事件等要素", "梳理事件的起因、经过、结果", "删除次要信息，保留核心内容", "用简洁语言串联要素"], "checkPoints": ["六要素齐全", "主次分明", "语言简洁", "对应分值"], "tips": "3分答3点，4分答4点；不要变成原文复述" },
+      "情节梳理": { "steps": ["找出情节发展的关键节点", "划分开端、发展、高潮、结局", "关注时间词、地点转换词", "用简洁语言概括各阶段"], "checkPoints": ["阶段准确", "脉络清晰", "节点完整", "概括简洁"], "tips": "关注情感变化词和冲突升级处" },
+      "思路梳理": { "steps": ["整体感知文章主旨", "分段概括各部分内容", "找出贯穿全文的线索", "提炼作者的写作思路"], "checkPoints": ["感知准确", "概括到位", "线索清晰", "提炼精准"], "tips": "注意过渡句、总起句、总结句" },
+      "概念辨析": { "steps": ["准确界定各概念的内涵", "找出概念间的相同点", "分析概念间的不同点", "结合文本说明联系与区别"], "checkPoints": ["界定准确", "异同全面", "依据充分", "结论明确"], "tips": "注意限定词、修饰语的区别" },
+      "辨析题": { "steps": ["明确辨析对象（观点/事实）", "回归文本找依据", "对比分析异同", "得出明确结论"], "checkPoints": ["对象明确", "依据充分", "分析有理", "结论清晰"], "tips": "观点要有文本支撑，事实要准确对应" },
+      "概念应用": { "steps": ["准确理解概念内涵", "结合文本找到对应内容", "举例说明概念如何体现", "总结概念在文中的作用"], "checkPoints": ["理解准确", "对应恰当", "举例贴切", "总结到位"], "tips": "先理解后应用，避免望文生义" }
+    }
+  },
+  "词句赏析": {
+    "icon": "🔍", "desc": "品味语言，理解深层含义", "color": "#fff3e0", "borderColor": "#ff9800", "textColor": "#e65100",
+    "subtypes": {
+      "句子赏析": { "steps": ["判断手法（修辞/描写/用词/句式）", "分析内容：写出了什么特点/画面", "剖析效果：生动形象/增强气势等", "点明情感：表达了作者怎样的感情"], "checkPoints": ["手法正确", "内容具体", "效果准确", "情感到位"], "tips": "没有明显手法时，分析精妙传神的词语" },
+      "词语含义": { "steps": ["解释词语本义", "结合语境分析具体含义", "挖掘词语的比喻义/象征义", "分析表达的情感或主旨"], "checkPoints": ["本义准确", "语境贴切", "深层挖掘", "情感点明"], "tips": "注意词语的双关义和临时义" },
+      "词语逻辑": { "steps": ["分析词语间的逻辑关系（因果/递进/转折等）", "理清句子的逻辑层次", "说明逻辑关系对表达的作用", "联系上下文验证"], "checkPoints": ["逻辑正确", "层次清晰", "作用合理", "上下文呼应"], "tips": "关注关联词和语序安排" },
+      "词语作用": { "steps": ["解释词语含义", "分析在句中的具体作用", "说明对结构的作用（照应/过渡等）", "点明表达的情感"], "checkPoints": ["解词准确", "句中分析", "结构说明", "情感点出"], "tips": "从内容到结构，从表层到深层" },
+      "修辞手法": { "steps": ["准确指出修辞手法名称", "结合句子分析如何运用", "说明表达效果（生动形象/强调突出等）", "点明表达的情感或主旨"], "checkPoints": ["名称准确", "结合文本", "效果对应", "主旨点明"], "tips": "常见修辞：比喻、拟人、排比、夸张、对比、反问、设问、反复、对偶、借代" },
+      "语言特色": { "steps": ["判断整体语言风格", "分析用词特点（动词/叠词/成语等）", "分析句式特点（长短/整散/句式变化）", "总结修辞运用和表达效果"], "checkPoints": ["风格准确", "用词具体", "句式到位", "总结全面"], "tips": "结合具体词句分析，不要空泛贴标签" },
+      "语言得体": { "steps": ["判断语境（场合/对象/目的）", "分析说话人身份和关系", "评价语言表达是否得体", "说明得体或不得体的原因"], "checkPoints": ["语境准确", "身份到位", "评价合理", "原因充分"], "tips": "注意谦敬辞、语体色彩、感情色彩" },
+      "表达方式": { "steps": ["判断表达方式（记叙/描写/议论/抒情/说明）", "分析具体表达内容", "说明表达效果", "联系情感或主旨"], "checkPoints": ["方式正确", "内容具体", "效果准确", "关联情感"], "tips": "注意多种表达方式的综合运用" }
+    }
+  },
+  "作用分析": {
+    "icon": "⚖️", "desc": "分析某元素在文中的作用", "color": "#e8f5e9", "borderColor": "#4caf50", "textColor": "#2e7d32",
+    "subtypes": {
+      "段落作用": { "steps": ["判断段落位置（开头/中间/结尾）", "分析结构作用（总领/过渡/总结等）", "分析内容作用（交代/铺垫/深化等）", "说明对读者的效果"], "checkPoints": ["位置准确", "结构全面", "内容分析", "读者效果"], "tips": "开头段4作用，中间段3作用，结尾段4作用" },
+      "标题作用": { "steps": ["分析标题的表层含义", "挖掘标题的深层含义（象征/双关/比喻）", "分析结构作用（线索/悬念）", "说明表达效果（吸引读者/点明主旨）"], "checkPoints": ["表层分析", "深层挖掘", "结构说明", "效果点出"], "tips": "标题含义=表层义+深层义；作用从内容、结构、表达三方面答" },
+      "标题含义": { "steps": ["解释标题的字面意思", "联系文章内容分析具体含义", "挖掘象征义、比喻义、双关义", "点明标题与主旨的关系"], "checkPoints": ["字面解释", "文本联系", "深层挖掘", "主旨关联"], "tips": "由表及里，逐层深入" },
+      "结构作用": { "steps": ["找出结构上的特点（呼应/照应/铺垫）", "分析前后内容的关联", "说明对文章结构的作用", "点明对主题表达的效果"], "checkPoints": ["特点找准", "关联分析", "结构说明", "主题效果"], "tips": "关注过渡句、照应句、反复出现的词句" },
+      "情节作用": { "steps": ["分析该情节对人物塑造的作用", "分析对情节发展的作用", "分析对主题表达的作用", "分析对读者的效果"], "checkPoints": ["人物分析", "情节说明", "主题点出", "读者效果"], "tips": "从人物、情节、主题、读者四个维度思考" },
+      "细节描写作用": { "steps": ["判断细节描写类型", "分析细节描写的具体内容", "说明对人物塑造的作用", "联系主题说明深层作用"], "checkPoints": ["类型准确", "内容具体", "人物说明", "主题联系"], "tips": "细节描写往往以小见大，要挖掘深层含义" },
+      "环境描写作用": { "steps": ["交代时间、地点、季节、背景", "渲染气氛，奠定情感基调", "烘托人物心情或性格", "推动情节发展或暗示命运", "深化主题"], "checkPoints": ["背景交代", "气氛渲染", "人物烘托", "情节推动", "主题深化"], "tips": "自然环境6作用，社会环境5作用，根据文本灵活选取" },
+      "过渡作用": { "steps": ["概括上文内容", "概括下文内容", "说明承上启下的结构作用", "分析情感或逻辑的连贯性"], "checkPoints": ["上文准确", "下文到位", "结构说明", "连贯分析"], "tips": "过渡段/句是文章的血脉，要注意内容和结构双重作用" },
+      "选材组材": { "steps": ["分析选材的特点（典型/新颖/真实等）", "分析组材的方式（时间/空间/逻辑顺序）", "评价详略安排", "说明选材组材如何服务主旨"], "checkPoints": ["选材分析", "组材说明", "详略评价", "主旨服务"], "tips": "选材要为中心服务，组材要有逻辑" },
+      "论证结构": { "steps": ["判断整体论证结构（总分/并列/递进/对比）", "分析各段落之间的逻辑关系", "梳理论证的层次", "评价论证结构的表达效果"], "checkPoints": ["结构正确", "逻辑分析", "层次清晰", "效果评价"], "tips": "画出论证结构图，标出论点和论据" },
+      "中心论点": { "steps": ["找出中心论点的位置（标题/开头/结尾）", "分析中心论点的表述方式", "梳理论据如何支撑论点", "明确中心论点与分论点的关系"], "checkPoints": ["位置找准", "表述分析", "论据梳理", "关系明确"], "tips": "中心论点是议论文的灵魂，要准确提炼" },
+      "论据作用": { "steps": ["判断论据类型（事实/道理/比喻/对比）", "概括论据内容", "分析论据如何支撑论点", "评价论据的说服力"], "checkPoints": ["类型准确", "概括简洁", "支撑分析", "说服力评价"], "tips": "论据要典型、真实、与论点紧密相关" },
+      "论证方法": { "steps": ["准确指出论证方法", "概括论据内容", "说明论证效果（具体有力/权威可信等）", "点明论证的观点"], "checkPoints": ["方法准确", "概括到位", "效果对应", "观点点明"], "tips": "论证方法：举例、道理、对比、比喻、引用" },
+      "论证分析": { "steps": ["梳理论点（中心论点和分论点）", "分析论据内容和类型", "判断论证方法", "综合评价论证的严密性和说服力"], "checkPoints": ["论点完整", "论据到位", "方法准确", "评价全面"], "tips": "从论点、论据、论证三要素入手" },
+      "观点论证": { "steps": ["明确要论证的观点", "找出支撑观点的论据", "分析论证的方法和过程", "评价论证的说服力"], "checkPoints": ["观点明确", "论据充分", "论证严密", "说服力评价"], "tips": "观点要明确，论据要充分，论证要严密" },
+      "人称作用": { "steps": ["判断人称类型", "分析该人称的叙事特点", "说明对情感表达的作用", "评价对读者感受的影响"], "checkPoints": ["人称准确", "特点分析", "情感说明", "读者感受"], "tips": "第一人称真实亲切，第二人称直接对话，第三人称客观全面" }
+    }
+  },
+  "写法技巧": {
+    "icon": "✨", "desc": "识别并分析文章的写作手法", "color": "#f3e5f5", "borderColor": "#9c27b0", "textColor": "#7b1fa2",
+    "subtypes": {
+      "写作手法": { "steps": ["判断整体构思特点（悬念/伏笔/照应/铺垫/突转）", "分析表达方式的综合运用", "分析选材组材的特点", "综合评价表达效果"], "checkPoints": ["构思判断", "表达分析", "选材说明", "效果评价"], "tips": "注意手法之间的综合运用" },
+      "表现手法": { "steps": ["准确指出表现手法名称", "结合文本分析如何运用", "说明表达效果（突出/强调/曲折有致）", "联系主旨或情感"], "checkPoints": ["名称准确", "文本结合", "效果对应", "主旨关联"], "tips": "常见：象征、衬托、对比、欲扬先抑、以小见大、托物言志、借景抒情" }
+    }
+  },
+  "形象主旨": {
+    "icon": "👤", "desc": "分析人物形象，把握文章主旨", "color": "#fce4ec", "borderColor": "#e91e63", "textColor": "#c2185b",
+    "subtypes": {
+      "主旨概括": { "steps": ["概括文章主要内容", "分析作者的情感态度", "提炼文章的核心思想", "总结对读者的启示"], "checkPoints": ["内容准确", "情感分析", "思想提炼", "启示总结"], "tips": "主旨=内容+情感+态度；注意多角度" },
+      "人物形象": { "steps": ["从典型事例中概括品质", "从正面描写中分析性格", "从侧面描写中分析特点", "结合时代背景全面评价"], "checkPoints": ["事例典型", "正面分析", "侧面关注", "背景结合"], "tips": "按分值分点，6分至少答3点；避免贴标签，要有文本依据" },
+      "次要人物": { "steps": ["分析对主要人物的衬托作用", "分析对情节发展的推动作用", "分析对主题揭示的作用", "判断是否作为线索人物"], "checkPoints": ["衬托分析", "推动说明", "主题揭示", "线索判断"], "tips": "次要人物往往对主要人物和主题有重要作用" }
+    }
+  },
+  "开放探究": {
+    "icon": "💡", "desc": "结合文本，发表自己的见解", "color": "#e0f7fa", "borderColor": "#00bcd4", "textColor": "#00838f",
+    "subtypes": {
+      "拓展运用": { "steps": ["紧扣原文内容和主旨", "结合现实生活或自身实际", "提出具体可行的建议或方案", "注意语言得体，符合身份"], "checkPoints": ["紧扣原文", "实际恰当", "具体可行", "语言得体"], "tips": "建议要具体，方案要有操作性" },
+      "综合分析": { "steps": ["仔细审题，明确答题方向", "回归文本，定位相关信息", "多角度分析（内容/结构/情感/写法）", "整合要点，规范作答"], "checkPoints": ["审题准确", "定位精准", "多角度", "规范作答"], "tips": "综合题要面面俱到，但不能脱离文本" }
+    }
+  }
+};
+
+// ============================================================
+// 大类分类映射与全局变量
+// ============================================================
+const LITERARY_GENRES = new Set(["小说", "散文", "记叙文", "诗歌", "戏剧", "童话", "寓言", "神话", "故事", "传记文学", "报告文学", "杂文", "随笔", "游记", "书信", "日记", "回忆录", "抒情散文", "叙事散文", "哲理散文", "写景散文"]);
+const PRACTICAL_GENRES = new Set(["说明文", "议论文", "新闻", "消息", "通讯", "评论", "演讲稿", "调查报告", "科普文", "应用文", "通知", "公告", "倡议书", "说明书", "非连续性文本", "图表", "广告", "合同", "简历", "申请书", "实用类文本", "论述类文本", "信息类文本"]);
+
+function classifyGenre(genreName) {
+    if (!genreName) return "未分类";
+    const g = genreName.trim();
+    if (LITERARY_GENRES.has(g)) return "文学类文本";
+    if (PRACTICAL_GENRES.has(g)) return "实用类文本";
+    for (const lg of LITERARY_GENRES) { if (g.includes(lg) || lg.includes(g)) return "文学类文本"; }
+    for (const pg of PRACTICAL_GENRES) { if (g.includes(pg) || pg.includes(g)) return "实用类文本"; }
+    return "未分类";
+}
+
+let rawDb = [];
+let activeDb = [];
+let allTagsMap = {};
+let allTagsScoreMap = {};
+let currentPassageId = null;
+let globalIdCounter = 1;
+let selectedMajorCategory = null;
+
+// ============================================================
+// 模板匹配与答案拆解算法
+// ============================================================
+function matchTemplate(tagText) {
+    if (!tagText) return null;
+    const tags = tagText.split(/[、，,\s]+/).filter(t => t.trim().length > 0);
+    for (const tag of tags) {
+        if (TagMapping[tag]) {
+            const map = TagMapping[tag];
+            const catData = TemplateLibrary[map.category];
+            const subData = catData ? catData.subtypes[map.subtype] : null;
+            if (subData) return { category: map.category, subtype: map.subtype, formula: map.formula, icon: catData.icon, desc: catData.desc, color: catData.color, borderColor: catData.borderColor, textColor: catData.textColor, template: subData, matchedTag: tag };
+        }
+    }
+    for (const tag of tags) {
+        for (const [key, map] of Object.entries(TagMapping)) {
+            if (tag.includes(key) || key.includes(tag)) {
+                const catData = TemplateLibrary[map.category];
+                const subData = catData ? catData.subtypes[map.subtype] : null;
+                if (subData) return { category: map.category, subtype: map.subtype, formula: map.formula, icon: catData.icon, desc: catData.desc, color: catData.color, borderColor: catData.borderColor, textColor: catData.textColor, template: subData, matchedTag: key };
             }
         }
+    }
+    return null;
+}
 
-        // ========== 文件处理 ==========
-        function processFiles(files) {
-            const audioFiles = [];
-            const jsonFiles = [];
+// ============================================================
+// 核心：终极解析引擎与全局去重合并机制
+// ============================================================
 
-            for (const file of files) {
-                const name = file.name.toLowerCase();
-                if (name.endsWith('.mp3') || file.type.startsWith('audio/')) {
-                    audioFiles.push(file);
-                } else if (name.endsWith('.json') || file.type === 'application/json') {
-                    jsonFiles.push(file);
-                }
+function cleanMarkdownSyntax(text) {
+    if (!text) return "";
+    let cleanText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    cleanText = cleanText.replace(/^(?:>|&gt;)\s*/gm, '');
+    cleanText = cleanText.replace(/^#+\s+/gm, '');
+    cleanText = cleanText.replace(/==(.*?)==/g, '<mark>$1</mark>');
+    return cleanText.trim();
+}
+
+// 强力提取核心标题函数：彻底干掉重复文章的元凶
+function getCoreTitle(title) {
+    if (!title) return "";
+    let t = title.replace(/\.(md|txt|json)/gi, '');
+    t = t.replace(/\[.*?\]/g, '').replace(/【.*?】/g, '').replace(/\(.*?\)/g, '').replace(/（.*?）/g, '');
+    let clean = t.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '').toLowerCase();
+    if (!clean) clean = title.replace(/\.(md|txt|json)/gi, '').replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '').toLowerCase();
+    return clean;
+}
+
+function extractCategoryAndGenre(text) {
+    const regex1 = /(?:>|&gt;)\s*\*\*分类\*\*\s*[：:]\s*([^\n]+)\s*\n\s*(?:>|&gt;)\s*\*\*体裁\*\*\s*[：:]\s*([^\n]+)/;
+    const regex2 = /###\s*分类\s*[：:]\s*([^\n]+)\s*\n\s*体裁\s*[：:]\s*([^\n#]+)\s*###/;
+    const match = text.match(regex1) || text.match(regex2);
+    if (match) {
+        return { category: match[1].trim(), genre: match[2].trim(), majorCategory: classifyGenre(match[2].trim()) };
+    }
+    return { category: null, genre: null, majorCategory: "未分类" };
+}
+
+function parseMarkdown(mdText, districtName) {
+    const globalMeta = extractCategoryAndGenre(mdText.substring(0, 500));
+    const articles = mdText.split('## 文章：');
+    articles.shift();
+    articles.forEach((art) => {
+        const firstNewline = art.indexOf('\n');
+        const title = `[${districtName}] ${cleanMarkdownSyntax(art.substring(0, firstNewline))}`;
+        const body = art.substring(firstNewline);
+        const articleMeta = extractCategoryAndGenre(body);
+        const finalMeta = articleMeta.category ? articleMeta : globalMeta;
+        const sections = body.split(/---\s*\n/);
+        const validSections = sections.filter(s => s.trim().length > 0);
+        if (validSections.length < 2) return;
+        let passageText = cleanMarkdownSyntax(validSections[0]);
+        let questions = [];
+
+        for (let i = 1; i < validSections.length; i++) {
+            const sec = validSections[i].trim();
+            if (!sec) continue;
+            let q = { type: 'essay', tagDisplay: '综合考点', tags: [], title: '', options: [], answer: '', explanation: '', score: 0 };
+            const scoreMatch = sec.match(/[（\(]\s*(\d+(\.\d+)?)\s*分\s*[）\)]/);
+            if (scoreMatch) q.score = parseFloat(scoreMatch[1]);
+            const metaStartIndex = sec.indexOf('\n>');
+            q.title = metaStartIndex !== -1 ? sec.substring(0, metaStartIndex).trim() : sec;
+            q.title = q.title.replace(/!\[.*?\]\((.*?)\)/g, '<br><a href="$1" target="_blank">[查看原卷插图]</a><br>').replace(/^\d+\.\s*/, '');
+            const tagMatch = sec.match(/> \*\*考点\*\*：(.*?)\s*(?=\n|$)/);
+            if (tagMatch) {
+                q.tagDisplay = cleanMarkdownSyntax(tagMatch[1]);
+                q.tags = q.tagDisplay.split(/[、，,\s]+/).filter(t => t.trim().length > 0);
+            } else {
+                q.tags = ["综合考点"];
             }
-
-            audioFiles.forEach(file => {
-                const base = file.name.replace(/\.[^/.]+$/, '');
-                if (!fileMap.has(base)) fileMap.set(base, {});
-                fileMap.get(base).mp3 = file;
-            });
-
-            jsonFiles.forEach(file => {
-                const base = file.name.replace(/\.[^/.]+$/, '');
-                if (!fileMap.has(base)) fileMap.set(base, {});
-                fileMap.get(base).json = file;
-            });
-
-            renderPairs();
-        }
-
-        function renderPairs() {
-            pairList.innerHTML = '';
-            let matched = 0, audioOnly = 0, jsonOnly = 0;
-
-            fileMap.forEach((val, name) => {
-                const hasAudio = !!val.mp3;
-                const hasJson = !!val.json;
-                const tag = document.createElement('span');
-                tag.className = 'pair-tag';
-
-                if (hasAudio && hasJson) {
-                    tag.textContent = name;
-                    tag.dataset.name = name;
-                    tag.onclick = () => loadPair(name);
-                    matched++;
-                } else if (hasAudio) {
-                    tag.textContent = name + ' (缺JSON)';
-                    tag.classList.add('missing');
-                    audioOnly++;
-                } else {
-                    tag.textContent = name + ' (缺MP3)';
-                    tag.classList.add('missing');
-                    jsonOnly++;
-                }
-                pairList.appendChild(tag);
-            });
-
-            stats.innerHTML = `找到 <b>${fileMap.size}</b> 组文件： <b style="color:#059669">${matched}</b> 组已匹配 | <b style="color:#dc2626">${audioOnly + jsonOnly}</b> 组不完整`;
-
-            if (matched > 0) {
-                pairSelector.classList.add('active');
-                const firstMatch = Array.from(fileMap.entries()).find(([_, v]) => v.mp3 && v.json);
-                if (firstMatch && !currentPairName) loadPair(firstMatch[0]);
+            const ansMatch = sec.match(/> \*\*答案\*\*：([\s\S]*?)(?=\n> \*\*解析\*\*：|\n> \*\*考点\*\*：|$)/);
+            if (ansMatch) q.answer = cleanMarkdownSyntax(ansMatch[1]);
+            const expMatch = sec.match(/> \*\*解析\*\*：([\s\S]*)$/);
+            if (expMatch) q.explanation = cleanMarkdownSyntax(expMatch[1]);
+            const optionRegex = /^[A-E]\.\s*(.*?)$/gm;
+            let optMatch;
+            let optIndex = [];
+            while ((optMatch = optionRegex.exec(sec)) !== null) {
+                q.options.push(cleanMarkdownSyntax(optMatch[0]));
+                optIndex.push(optMatch.index);
             }
+            if (q.options.length > 0 && optIndex.length > 0) {
+                q.type = 'radio';
+                const firstOptIndex = sec.indexOf(q.options[0]);
+                if (firstOptIndex < metaStartIndex) q.title = cleanMarkdownSyntax(sec.substring(0, firstOptIndex)).replace(/^\d+\.\s*/, '');
+            }
+            if (q.title) questions.push(q);
         }
-
-        async function loadPair(name) {
-            const pair = fileMap.get(name);
-            if (!pair || !pair.mp3 || !pair.json) return;
-
-            currentPairName = name;
-            offset = 0;
-            offsetInput.value = 0;
-            pointA = null; pointB = null; abLooping = false; loopMode = false;
-            updateABStatus(); updateLoopBtn();
-
-            document.querySelectorAll('.pair-tag').forEach(t => {
-                t.classList.toggle('active', t.dataset.name === name);
-            });
-
-            // 加载音频
-            const audioUrl = URL.createObjectURL(pair.mp3);
-            audioPlayer.src = audioUrl;
-            audioPanel.style.display = 'block';
-            controlPanel.classList.add('active');
-            currentTitle.textContent = '▶️ ' + name;
-
-            // 解码音频用于自动检测前言
-            try {
-                const arrayBuffer = await pair.mp3.arrayBuffer();
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                currentAudioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-            } catch(e) { currentAudioBuffer = null; }
-
-            // 加载JSON
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                try {
-                    const data = JSON.parse(event.target.result);
-                    if (data.sentences) {
-                        rawSubtitles = data.sentences;
-                    } else if (data.files && data.files[0] && data.files[0].sentences) {
-                        rawSubtitles = data.files[0].sentences;
-                    } else {
-                        throw new Error('无法识别JSON结构');
-                    }
-                    applyOffset();
-                } catch (error) {
-                    alert('JSON 解析失败: ' + error.message);
-                }
-            };
-            reader.readAsText(pair.json);
-        }
-
-        // ========== 前言偏移 ==========
-        function applyOffset() {
-            offset = parseFloat(offsetInput.value) || 0;
-            displaySubtitles = rawSubtitles.map(s => ({
-                start: (s.start || 0) + offset,
-                end: (s.end || 0) + offset,
-                en: s.en || '',
-                zh: s.zh || '',
-                keywords: s.keywords || []
-            }));
-            renderSubtitles();
-        }
-
-        offsetInput.addEventListener('change', applyOffset);
-        document.getElementById('btnApplyOffset').addEventListener('click', applyOffset);
-        document.getElementById('btnOffset20').addEventListener('click', () => {
-            offsetInput.value = 20;
-            applyOffset();
-        });
         
+        // 盲压入数组，等待去重合并
+        rawDb.push({ id: globalIdCounter++, title: title, text: passageText, questions: questions, category: finalMeta.category, genre: finalMeta.genre, majorCategory: finalMeta.majorCategory, hierarchy_analysis: [] });
+    });
+}
 
-        // 自动检测前言：分析音频前5秒，找第一个超过阈值的点
-        document.getElementById('btnAutoDetect').addEventListener('click', () => {
-            if (!currentAudioBuffer) {
-                alert('音频尚未加载完成，请稍后再试');
-                return;
-            }
-            const threshold = 0.02; // 音量阈值
-            const data = currentAudioBuffer.getChannelData(0);
-            const sampleRate = currentAudioBuffer.sampleRate;
-            const maxSamples = Math.min(data.length, sampleRate * 5); // 只分析前5秒
+function parseJSON(jsonText, districtName) {
+    let data;
+    try { data = JSON.parse(jsonText); } catch (e) { return; }
+    const articles = Array.isArray(data) ? data : (data.articles || []);
 
-            let firstVoice = 0;
-            for (let i = 0; i < maxSamples; i++) {
-                if (Math.abs(data[i]) > threshold) {
-                    firstVoice = i / sampleRate;
-                    break;
-                }
-            }
-            // 稍微提前一点
-            firstVoice = Math.max(0, firstVoice - 0.1);
-            offsetInput.value = firstVoice.toFixed(1);
-            applyOffset();
-        });
+    articles.forEach(art => {
+        const title = art.title || art.标题 || "未命名文章";
+        const genre = art.genre || art.体裁 || null;
+        const category = art.category || art.分类 || null;
+        const majorCategory = genre ? classifyGenre(genre) : "未分类";
+        const text = art.text || art.正文 || art.content || "";
+        const questions = [];
 
-        // ========== 渲染字幕 ==========
-        function renderSubtitles() {
-            subtitleContainer.innerHTML = '';
-            displaySubtitles.forEach((sub, index) => {
-                let enHtml = sub.en;
-                (sub.keywords || []).forEach(kw => {
-                    const regex = new RegExp('\\b' + kw + '\\b', 'gi');
-                    enHtml = enHtml.replace(regex, '<span class="keyword">$&</span>');
-                });
-
-                const div = document.createElement('div');
-                div.className = 'sentence-box';
-                div.id = 'sub-' + index;
-                div.dataset.index = index;
-                div.innerHTML = `
-                    <div class="en-text">
-                        <span class="time-badge">${fmt(sub.start)} - ${fmt(sub.end)}</span>
-                        ${enHtml}
-                    </div>
-                    <div class="zh-text">${sub.zh}</div>
-                    <div class="sentence-actions">
-                        <button class="icon-btn ${loopMode ? 'active' : ''}" title="循环本句" onclick="event.stopPropagation(); toggleLoop();">🔁</button>
-                        <button class="icon-btn ${pointA === index ? 'active' : ''}" title="设为A点" onclick="event.stopPropagation(); setPointA(${index});">A</button>
-                        <button class="icon-btn ${pointB === index ? 'active' : ''}" title="设为B点" onclick="event.stopPropagation(); setPointB(${index});">B</button>
-                    </div>
-                `;
-                div.onclick = () => playSentence(index);
-                subtitleContainer.appendChild(div);
-            });
-            updateABVisuals();
-        }
-
-        function fmt(s) {
-            const m = Math.floor(s / 60);
-            const sec = Math.floor(s % 60);
-            const ms = Math.floor((s % 1) * 10);
-            return m + ':' + sec.toString().padStart(2, '0') + '.' + ms;
-        }
-
-        // ========== 播放控制 ==========
-        function playSentence(index) {
-            const sub = displaySubtitles[index];
-            if (!sub) return;
-            const doSeekAndPlay = () => {
-                audioPlayer.currentTime = sub.start;
-                const onSeeked = () => {
-                    audioPlayer.removeEventListener('seeked', onSeeked);
-                    audioPlayer.play().catch(() => {});
-                };
-                audioPlayer.addEventListener('seeked', onSeeked);
+        const qList = art.questions || art.题目 || art.questionList || [];
+        qList.forEach(qData => {
+            let q = {
+                type: 'essay',
+                tagDisplay: qData.tag || qData.考点 || qData.tags || '综合考点',
+                tags: [],
+                title: cleanMarkdownSyntax(qData.title || qData.题干 || qData.question || ''),
+                options: qData.options || qData.选项 || [],
+                answer: cleanMarkdownSyntax(qData.answer || qData.答案 || ''),
+                explanation: cleanMarkdownSyntax(qData.explanation || qData.解析 || ''),
+                score: parseFloat(qData.score || qData.分值 || qData.points || 0)
             };
-            if (audioPlayer.readyState >= 2) {
-                doSeekAndPlay();
-            } else {
-                audioPlayer.addEventListener('canplay', doSeekAndPlay, { once: true });
+            let tagStr = q.tagDisplay;
+            q.tags = Array.isArray(tagStr) ? tagStr : String(tagStr).split(/[、，,\s]+/).filter(t => t.trim().length > 0);
+            q.tagDisplay = q.tags.join('、');
+            if (q.options && q.options.length > 0) {
+                q.type = 'radio';
+                q.options = q.options.map(opt => typeof opt === 'string' ? opt : `${opt.label || opt.key || ''}. ${opt.text || opt.content || opt}`);
             }
-        }
+            if (q.title) questions.push(q);
+        });
 
-        // 单句循环
-        document.getElementById('btnLoop').addEventListener('click', toggleLoop);
-        function toggleLoop() {
-            loopMode = !loopMode;
-            updateLoopBtn();
-            document.querySelectorAll('.icon-btn').forEach(btn => {
-                if (btn.textContent === '🔁') btn.classList.toggle('active', loopMode);
+        // 盲压入数组，等待去重合并
+        if (questions.length > 0 || (text && text.length > 10) || (art.hierarchy_analysis && art.hierarchy_analysis.length > 0)) {
+            rawDb.push({ id: globalIdCounter++, title: `[${districtName}] ${cleanMarkdownSyntax(title)}`, text: cleanMarkdownSyntax(text), questions: questions, category: category, genre: genre, majorCategory: majorCategory, hierarchy_analysis: art.hierarchy_analysis || [] });
+        }
+    });
+}
+
+// ✅ 最强文件监听器：读取 -> 智能去重 -> 无缝合并
+document.getElementById('fileInput').addEventListener('change', async function(e) {
+    const files = Array.from(e.target.files).filter(f => f.name.endsWith('.md') || f.name.endsWith('.txt') || f.name.endsWith('.json'));
+    if (files.length === 0) return alert("选中的文件夹中没有找到 Markdown / TXT / JSON 文件！");
+
+    rawDb = [];
+    selectedMajorCategory = null;
+    globalIdCounter = 1;
+
+    const textFiles = files.filter(f => f.name.endsWith('.md') || f.name.endsWith('.txt'));
+    const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+
+    for (const file of textFiles) {
+        const content = await file.text();
+        const districtName = file.name.split('_')[0].replace(/\.(md|txt)$/i, '');
+        parseMarkdown(content, districtName);
+    }
+    for (const file of jsonFiles) {
+        const content = await file.text();
+        const districtName = file.name.split('_')[0].replace(/\.json$/i, '');
+        parseJSON(content, districtName);
+    }
+
+    let uniqueDbMap = new Map();
+    
+    rawDb.forEach(item => {
+        let core = getCoreTitle(item.title);
+        if (uniqueDbMap.has(core)) {
+            let existing = uniqueDbMap.get(core);
+            // 合并层次拆解
+            if ((!existing.hierarchy_analysis || existing.hierarchy_analysis.length === 0) && (item.hierarchy_analysis && item.hierarchy_analysis.length > 0)) {
+                existing.hierarchy_analysis = item.hierarchy_analysis;
+            }
+            // 合并正文
+            if (!existing.text && item.text) existing.text = item.text;
+            // 合并题目
+            if (existing.questions.length === 0 && item.questions.length > 0) existing.questions = item.questions;
+            // 合并体裁分类
+            if (item.genre && existing.majorCategory === "未分类") {
+                existing.genre = item.genre;
+                existing.majorCategory = classifyGenre(item.genre);
+            }
+        } else {
+            uniqueDbMap.set(core, item);
+        }
+    });
+
+    // 剔除幽灵空壳，仅保留包含至少一道题目的真实文章
+    rawDb = Array.from(uniqueDbMap.values()).filter(item => item.questions && item.questions.length > 0);
+
+    // 重新精密计算考点统计
+    allTagsMap = {};
+    allTagsScoreMap = {};
+    rawDb.forEach(item => {
+        item.questions.forEach(q => {
+            q.tags.forEach(t => {
+                allTagsMap[t] = (allTagsMap[t] || 0) + 1;
+                allTagsScoreMap[t] = (allTagsScoreMap[t] || 0) + q.score;
             });
-        }
-        function updateLoopBtn() {
-            const btn = document.getElementById('btnLoop');
-            btn.textContent = loopMode ? '单句循环: 开' : '单句循环: 关';
-            btn.style.background = loopMode ? '#059669' : '#2563eb';
-            playStatus.textContent = loopMode ? '🔁 单句循环' : (abLooping ? '🔂 AB复读' : '播放中');
-            playStatus.className = 'status-badge' + (loopMode ? ' looping' : '');
-        }
-
-        // AB复读
-        document.getElementById('btnSetA').addEventListener('click', () => {
-            const idx = getCurrentSentenceIndex();
-            if (idx >= 0) setPointA(idx);
         });
-        document.getElementById('btnSetB').addEventListener('click', () => {
-            const idx = getCurrentSentenceIndex();
-            if (idx >= 0) setPointB(idx);
-        });
-        document.getElementById('btnClearAB').addEventListener('click', clearAB);
+    });
 
-        function setPointA(index) {
-            pointA = index;
-            if (pointB !== null && pointB < pointA) pointB = null; // B不能在A前面
-            updateABStatus();
-            updateABVisuals();
-        }
-        function setPointB(index) {
-            if (pointA === null) { alert('请先设置A点'); return; }
-            if (index < pointA) { alert('B点必须在A点之后'); return; }
-            pointB = index;
-            abLooping = true;
-            updateABStatus();
-            updateABVisuals();
-            // 立即开始AB复读
-            playSentence(pointA);
-        }
-        function clearAB() {
-            pointA = null; pointB = null; abLooping = false;
-            updateABStatus();
-            updateABVisuals();
-        }
-        function updateABStatus() {
-            if (pointA === null) {
-                abStatus.textContent = 'AB复读: 未设置';
-            } else if (pointB === null) {
-                abStatus.textContent = 'AB复读: A=' + (pointA + 1) + ', B=未设置';
-            } else {
-                abStatus.textContent = 'AB复读: A=' + (pointA + 1) + ' → B=' + (pointB + 1);
-            }
-        }
-        function updateABVisuals() {
-            document.querySelectorAll('.sentence-box').forEach((el, i) => {
-                el.classList.remove('ab-a', 'ab-b', 'ab-range');
-                if (i === pointA) el.classList.add('ab-a');
-                if (i === pointB) el.classList.add('ab-b');
-                if (pointA !== null && pointB !== null && i > pointA && i < pointB) {
-                    el.classList.add('ab-range');
-                }
-            });
-            document.querySelectorAll('.icon-btn').forEach(btn => {
-                if (btn.textContent === 'A') btn.classList.toggle('active', false);
-                if (btn.textContent === 'B') btn.classList.toggle('active', false);
-            });
-            if (pointA !== null) {
-                const aEl = document.querySelector('#sub-' + pointA + ' .icon-btn:nth-child(2)');
-                if (aEl) aEl.classList.add('active');
-            }
-            if (pointB !== null) {
-                const bEl = document.querySelector('#sub-' + pointB + ' .icon-btn:nth-child(3)');
-                if (bEl) bEl.classList.add('active');
-            }
-        }
+    if (rawDb.length > 0) {
+        document.getElementById('placeholder').style.display = 'none';
+        renderDashboard();
+    } else {
+        alert('解析失败，请检查文档格式。未找到有效题目。');
+    }
+});
 
-        function getCurrentSentenceIndex() {
-            const t = audioPlayer.currentTime;
-            for (let i = 0; i < displaySubtitles.length; i++) {
-                if (t >= displaySubtitles[i].start && t <= displaySubtitles[i].end) return i;
-            }
-            // 找最接近的
-            let closest = 0, minDiff = Infinity;
-            for (let i = 0; i < displaySubtitles.length; i++) {
-                const diff = Math.abs(t - displaySubtitles[i].start);
-                if (diff < minDiff) { minDiff = diff; closest = i; }
-            }
-            return closest;
-        }
 
-        // ========== 时间同步 ==========
-        let lastActiveIndex = -1;
-        audioPlayer.addEventListener('timeupdate', () => {
-            const t = audioPlayer.currentTime;
-            let activeIndex = -1;
+// ============================================================
+// 🚀 核心升级：载入补充数据 (同时支持 层次JSON 和 深度解析MD)
+// ============================================================
+document.getElementById('hierarchyInput').addEventListener('change', async function(e) {
+    const files = Array.from(e.target.files).filter(f => f.name.endsWith('.json') || f.name.endsWith('.md') || f.name.endsWith('.txt'));
+    if (files.length === 0) return alert("请选择有效的 JSON 或 MD 文件！");
+    if (rawDb.length === 0) return alert("请先点击右侧按钮【载入区模拟题库文件夹】，然后再载入补充数据！");
 
-            for (let i = 0; i < displaySubtitles.length; i++) {
-                const el = document.getElementById('sub-' + i);
-                if (!el) continue;
-                if (t >= displaySubtitles[i].start && t <= displaySubtitles[i].end) {
-                    el.classList.add('active');
-                    activeIndex = i;
-                } else {
-                    el.classList.remove('active');
-                }
-            }
+    let jsonMatchCount = 0;
+    let mdMatchCount = 0;
 
-            if (activeIndex >= 0 && activeIndex !== lastActiveIndex) {
-                const el = document.getElementById('sub-' + activeIndex);
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                lastActiveIndex = activeIndex;
-            }
+    const jsonFiles = files.filter(f => f.name.endsWith('.json'));
+    const mdFiles = files.filter(f => f.name.endsWith('.md') || f.name.endsWith('.txt'));
 
-            // 单句循环检测
-            if (loopMode && activeIndex >= 0) {
-                const sub = displaySubtitles[activeIndex];
-                const duration = sub.end - sub.start;
-                // 只有句子长度大于 0.3 秒才触发循环，避免极短句子的边界问题
-                if (duration > 0.3 && t >= sub.end - 0.15) {
-                    audioPlayer.currentTime = sub.start;
-                }
-            }
-
-            // AB复读检测
-            if (abLooping && pointA !== null && pointB !== null) {
-                const endTime = displaySubtitles[pointB].end;
-                if (t >= endTime - 0.15) {
-                    audioPlayer.currentTime = displaySubtitles[pointA].start;
-                }
-            }
-        });
-
-        audioPlayer.addEventListener('play', () => {
-            playStatus.textContent = loopMode ? '🔁 单句循环' : (abLooping ? '🔂 AB复读' : '▶️ 播放中');
-        });
-        audioPlayer.addEventListener('pause', () => {
-            playStatus.textContent = '⏸ 已暂停';
-        });
-
-        // ========== 键盘快捷键 ==========
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT') return; // 输入框内不触发
-
-            switch(e.code) {
-                case 'Space':
-                    e.preventDefault();
-                    if (audioPlayer.paused) audioPlayer.play(); else audioPlayer.pause();
-                    break;
-                case 'KeyL':
-                    toggleLoop();
-                    break;
-                case 'KeyA':
-                    if (!e.ctrlKey && !e.metaKey) {
-                        const idx = getCurrentSentenceIndex();
-                        if (idx >= 0) setPointA(idx);
+    // 1. 合并层次拆解 JSON
+    for (const file of jsonFiles) {
+        const content = await file.text();
+        try {
+            const data = JSON.parse(content);
+            const articles = Array.isArray(data) ? data : (data.articles || []);
+            articles.forEach(art => {
+                if (art.hierarchy_analysis && art.hierarchy_analysis.length > 0) {
+                    const coreTitle = getCoreTitle(art.title);
+                    const matchedItem = rawDb.find(dbItem => getCoreTitle(dbItem.title) === coreTitle);
+                    if (matchedItem) {
+                        matchedItem.hierarchy_analysis = art.hierarchy_analysis;
+                        jsonMatchCount++;
+                        const activeItem = activeDb.find(a => a.id === matchedItem.id);
+                        if (activeItem) activeItem.hierarchy_analysis = art.hierarchy_analysis;
                     }
-                    break;
-                case 'KeyB':
-                    if (!e.ctrlKey && !e.metaKey) {
-                        const idx = getCurrentSentenceIndex();
-                        if (idx >= 0) setPointB(idx);
+                }
+            });
+        } catch (err) {
+            console.error(`解析层次拆解 JSON 失败:`, err);
+        }
+    }
+
+    // 2. 合并深度解析 MD
+    for (const file of mdFiles) {
+        const content = await file.text();
+        const articles = content.split('## 文章：');
+        articles.shift();
+
+        articles.forEach(art => {
+            const firstNewline = art.indexOf('\n');
+            const title = art.substring(0, firstNewline).trim();
+            const coreTitle = getCoreTitle(title);
+            const matchedItem = rawDb.find(dbItem => getCoreTitle(dbItem.title) === coreTitle);
+
+            if (matchedItem) {
+                mdMatchCount++;
+                const sections = art.split(/---\s*\n/).filter(s => s.trim().length > 0);
+                let qIndex = 0;
+
+                for (let i = 1; i < sections.length; i++) {
+                    const sec = sections[i].trim();
+                    if (!sec) continue;
+
+                    // 提取 AI 生成的深度解析
+                    const expMatch = sec.match(/> \*\*解析\*\*：([\s\S]*)$/);
+                    if (expMatch && matchedItem.questions[qIndex]) {
+                        // 将新的深度解析覆盖进去
+                        matchedItem.questions[qIndex].explanation = cleanMarkdownSyntax(expMatch[1]);
+
+                        // 同步给活跃队列
+                        const activeItem = activeDb.find(a => a.id === matchedItem.id);
+                        if (activeItem && activeItem.questions[qIndex]) {
+                            activeItem.questions[qIndex].explanation = cleanMarkdownSyntax(expMatch[1]);
+                        }
                     }
-                    break;
-                case 'ArrowLeft':
-                    e.preventDefault();
-                    audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 5);
-                    break;
-                case 'ArrowRight':
-                    e.preventDefault();
-                    audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + 5);
-                    break;
+                    qIndex++;
+                }
             }
         });
+    }
 
-        // ========== 拖拽上传 ==========
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            processFiles(Array.from(e.dataTransfer.files));
+    e.target.value = '';
+    alert(`补充数据载入完成！\n成功关联层次拆解：${jsonMatchCount} 篇\n成功关联深度解析：${mdMatchCount} 篇`);
+    if (document.getElementById('practice-section').style.display === 'block' && currentPassageId) {
+        loadPassage(currentPassageId);
+    }
+});
+
+// ============================================================
+// 界面渲染与交互核心
+// ============================================================
+
+function renderDashboard() {
+    document.getElementById('practice-section').style.display = 'none';
+    document.getElementById('dashboard-section').style.display = 'block';
+    document.getElementById('awareness-banner').classList.remove('show');
+
+    const categoryStats = { "文学类文本": { count: 0, score: 0, articles: [] }, "实用类文本": { count: 0, score: 0, articles: [] }, "未分类": { count: 0, score: 0, articles: [] } };
+    let totalQ = 0, totalS = 0;
+
+    rawDb.forEach(p => {
+        const mc = p.majorCategory || "未分类";
+        categoryStats[mc].count++;
+        categoryStats[mc].articles.push(p);
+        p.questions.forEach(q => { totalQ++; totalS += q.score; categoryStats[mc].score += q.score; });
+    });
+
+    document.getElementById('stat-articles').innerText = rawDb.length;
+    document.getElementById('stat-questions').innerText = totalQ;
+    document.getElementById('stat-score').innerText = totalS;
+    document.getElementById('stat-tags').innerText = Object.keys(allTagsMap).length;
+
+    const catOverview = document.getElementById('category-overview');
+    catOverview.innerHTML = '';
+    const majorCategories = ["文学类文本", "实用类文本", "未分类"];
+    const catConfig = {
+        "文学类文本": { icon: "📖", className: "literary", desc: "小说、散文、记叙文、诗歌等" },
+        "实用类文本": { icon: "📰", className: "practical", desc: "说明文、议论文、新闻、非连续性文本等" },
+        "未分类": { icon: "❓", className: "", desc: "未能自动识别体裁的文章" }
+    };
+
+    majorCategories.forEach(mc => {
+        const stats = categoryStats[mc];
+        if (stats.count === 0) return;
+        const cfg = catConfig[mc];
+        const percentage = totalS > 0 ? ((stats.score / totalS) * 100).toFixed(1) : 0;
+        const isActive = selectedMajorCategory === mc;
+        const card = document.createElement('div');
+        card.className = `category-card ${cfg.className} ${isActive ? 'active' : ''}`;
+        card.onclick = () => selectMajorCategory(mc);
+        card.innerHTML = `
+            <div class="cat-percentage">${percentage}%</div>
+            <div class="cat-icon">${cfg.icon}</div>
+            <div class="cat-name">${mc}</div>
+            <div class="cat-stats">
+                <div class="cat-stat-item"><div class="cat-stat-num">${stats.count}</div><div class="cat-stat-label">篇文章</div></div>
+                <div class="cat-stat-item"><div class="cat-stat-num">${stats.score}</div><div class="cat-stat-label">总分值</div></div>
+                <div class="cat-stat-item"><div class="cat-stat-num">${stats.articles.reduce((sum, a) => sum + a.questions.length, 0)}</div><div class="cat-stat-label">道题目</div></div>
+            </div>
+            <div class="cat-hint">${isActive ? '✅ 已选中，下方标签已展开' : '👆 点击展开该类考点标签'}</div>
+        `;
+        catOverview.appendChild(card);
+    });
+    renderTagsCloud();
+}
+
+function selectMajorCategory(category) {
+    selectedMajorCategory = selectedMajorCategory === category ? null : category;
+    renderDashboard();
+}
+
+function renderTagsCloud() {
+    const tagsContainer = document.getElementById('tags-cloud-container');
+    const mask = document.getElementById('tags-section-mask');
+    tagsContainer.innerHTML = '';
+    if (!selectedMajorCategory) { mask.classList.add('locked'); return; }
+    mask.classList.remove('locked');
+
+    const filteredTagsMap = {}; const filteredTagsScoreMap = {}; let categoryTotalScore = 0;
+    rawDb.forEach(p => {
+        if (p.majorCategory !== selectedMajorCategory) return;
+        p.questions.forEach(q => { categoryTotalScore += q.score; q.tags.forEach(t => { filteredTagsMap[t] = (filteredTagsMap[t] || 0) + 1; filteredTagsScoreMap[t] = (filteredTagsScoreMap[t] || 0) + q.score; }); });
+    });
+
+    const sortedTags = Object.entries(filteredTagsMap).sort((a, b) => b[1] - a[1]);
+    if (sortedTags.length === 0) { tagsContainer.innerHTML = '<div style="color:#999;font-size:13px;padding:20px;">该大类下暂无考点标签数据。</div>'; return; }
+    sortedTags.forEach(([tag, count], index) => {
+        const tagScore = filteredTagsScoreMap[tag] || 0;
+        const weight = categoryTotalScore > 0 ? ((tagScore / categoryTotalScore) * 100).toFixed(1) : 0;
+        const html = `<div><input type="checkbox" id="tag_${index}" value="${tag}" class="tag-checkbox"><label for="tag_${index}" class="tag-label">${tag} <span class="tag-count">(${count}题|${tagScore}分|${weight}%)</span></label></div>`;
+        tagsContainer.insertAdjacentHTML('beforeend', html);
+    });
+}
+
+function startPractice() {
+    const checkboxes = document.querySelectorAll('.tag-checkbox:checked');
+    const selectedTags = Array.from(checkboxes).map(cb => cb.value);
+
+    activeDb = selectedMajorCategory ? rawDb.filter(p => p.majorCategory === selectedMajorCategory) : JSON.parse(JSON.stringify(rawDb));
+    if (selectedTags.length > 0) {
+        activeDb = activeDb.map(p => {
+            let newPassage = JSON.parse(JSON.stringify(p));
+            newPassage.questions = p.questions.filter(q => q.tags.some(t => selectedTags.includes(t)));
+            return newPassage;
+        }).filter(p => p.questions.length > 0);
+    }
+    if (activeDb.length === 0) return alert("没有找到符合这些考点的题目哦，请重新选择。");
+
+    document.getElementById('dashboard-section').style.display = 'none';
+    document.getElementById('practice-section').style.display = 'block';
+    document.getElementById('awareness-banner').classList.add('show');
+    currentPassageId = activeDb[0].id;
+    renderTabs();
+    loadPassage(currentPassageId);
+}
+
+function backToDashboard() {
+    document.getElementById('practice-section').style.display = 'none';
+    document.getElementById('dashboard-section').style.display = 'block';
+    document.getElementById('awareness-banner').classList.remove('show');
+}
+
+function renderTabs() {
+    const tabContainer = document.getElementById('tab-container');
+    tabContainer.innerHTML = '';
+    activeDb.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = `tab-btn ${item.id === currentPassageId ? 'active' : ''}`;
+        let shortTitle = item.title.split('/')[0];
+        if(shortTitle.length > 15) shortTitle = shortTitle.substring(0, 15) + '...';
+        btn.innerHTML = `${shortTitle} <span style="color:#aaa; font-size:11px;">(${item.questions.length}题)</span>`;
+        btn.onclick = () => { currentPassageId = item.id; renderTabs(); loadPassage(item.id); };
+        tabContainer.appendChild(btn);
+    });
+}
+
+function toggleHierarchy() {
+    const hContainer = document.getElementById('hierarchy-container');
+    const btnToggle = document.getElementById('btn-toggle-hierarchy');
+    if (hContainer.style.display === 'none') { hContainer.style.display = 'block'; btnToggle.innerText = '📑 隐藏层次拆解'; } 
+    else { hContainer.style.display = 'none'; btnToggle.innerText = '📑 显示层次拆解'; }
+}
+
+function loadPassage(id) {
+    const data = activeDb.find(item => item.id === id);
+    document.getElementById('passage-title').innerHTML = data.title;
+    let formattedText = data.text.replace(/==(.*?)==/g, '<mark>$1</mark>');
+    document.getElementById('passage-content').innerHTML = formattedText;
+
+    const qContainer = document.getElementById('questions-container');
+    qContainer.innerHTML = '';
+
+    const hContainer = document.getElementById('hierarchy-container');
+    const btnToggle = document.getElementById('btn-toggle-hierarchy');
+
+    if (data.hierarchy_analysis && data.hierarchy_analysis.length > 0) {
+        btnToggle.style.display = 'inline-block';
+        btnToggle.disabled = false;
+        btnToggle.style.background = 'var(--warning-color)';
+        btnToggle.style.cursor = 'pointer';
+        btnToggle.innerText = '📑 显示层次拆解';
+        hContainer.style.display = 'none';
+
+        let hHtml = `<div style="border-bottom: 2px solid var(--accent-color); margin-bottom: 20px; padding-bottom: 8px;"><h3 style="margin: 0; color: var(--accent-color);">📑 文章层次逻辑拆解</h3></div>`;
+        data.hierarchy_analysis.forEach(level => {
+            let keywordsHtml = level.keywords && Array.isArray(level.keywords) ? level.keywords.map(k => `<span style="display:inline-block; background:var(--tag-bg); color:var(--tag-color); padding:2px 8px; border-radius:12px; font-size:12px; margin-right:6px; margin-bottom:6px; border:1px solid #c5cae9;">${k}</span>`).join('') : '';
+            hHtml += `<div style="background: #f8f9fa; border-left: 4px solid var(--accent-color); padding: 15px; border-radius: 0 8px 8px 0; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s ease;" onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+                <div style="display: flex; align-items: center; margin-bottom: 12px;"><span style="background: var(--accent-color); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; margin-right: 10px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(63, 81, 181, 0.3);">${level.level_index}</span><h4 style="margin: 0; color: var(--primary-color); font-size: 15px;">${level.level_name}</h4></div>
+                <div style="font-size: 13px; color: #666; margin-bottom: 8px; padding-left: 34px;">📍 <strong>对应原文区间：</strong> <span style="color:#000;">${level.text_range}</span></div>
+                <div style="font-size: 13px; margin-bottom: 10px; padding-left: 34px;">🔑 <strong>核心提示词：</strong> <div style="margin-top: 6px;">${keywordsHtml}</div></div>
+                <div style="font-size: 14px; color: #333; line-height: 1.6; background: white; padding: 10px 12px; border-radius: 6px; border: 1px dashed #d0d7de; margin-left: 34px;">📝 <strong>段落大意概括：</strong> ${level.summary}</div>
+            </div>`;
         });
-        document.getElementById('folderUpload').addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
-        document.getElementById('fileUpload').addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
+        hContainer.innerHTML = hHtml;
+    } else {
+        btnToggle.style.display = 'inline-block';
+        btnToggle.disabled = true;
+        btnToggle.style.background = '#cccccc';
+        btnToggle.style.cursor = 'not-allowed';
+        btnToggle.innerText = '📑 暂无层次拆解';
+        hContainer.innerHTML = '';
+        hContainer.style.display = 'none';
+    }
 
-        // ========== 页面加载时自动执行 ==========
-        document.addEventListener('DOMContentLoaded', autoLoadFromDirectory);
-    </script>
+    data.questions.forEach((q, index) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        let tagHtml = '';
+
+        // 依然保留考点标签作为展示和右侧引导用
+        const mt = q.matchedTemplate;
+        const tagColor = mt ? mt.borderColor : '#3f51b5';
+        const tagBg = mt ? mt.color : '#e8eaf6';
+        const tagText = mt ? mt.textColor : '#3f51b5';
+
+        q.tags.forEach((tag) => { tagHtml += `<span class="q-tag" onclick="showTemplateForTag('${tag}')" style="background:${tagBg};color:${tagText};border:1px solid ${tagColor};" title="点击查看细分题型模板">${tag}</span>`; });
+        let categoryBadge = mt ? `<span style="font-size:11px;color:${mt.textColor};background:${mt.color};padding:2px 8px;border-radius:10px;margin-right:6px;border:1px solid ${mt.borderColor};">${mt.icon} ${mt.category}</span>` : '';
+        let qHtml = `<div class="q-title">${categoryBadge}${tagHtml} 第${index + 1}题. ${q.title}</div>`;
+
+        if (q.type === 'radio') {
+            qHtml += `<ul class="options-list">`;
+            q.options.forEach((opt) => { qHtml += `<li><label><input type="radio" name="q_${id}_${index}"> ${opt}</label></li>`; });
+            qHtml += `</ul>`;
+        } else {
+            qHtml += `<textarea class="essay-input" placeholder="请在此构思你的答案...\n（点击上方考点标签可查看细分题型模板和答题公式）"></textarea>`;
+        }
+
+        // 将解析中的换行转换为 <br>
+        let expHtml = q.explanation.replace(/\n/g, '<br>');
+
+        // 🚀 核心魔改：使用正则抓取解析中所有被中文双引号 " " 包裹的内容，变成可点击的 span！
+        expHtml = expHtml.replace(/"([^"]+)"/g, function(match, innerText) {
+            // 排除含有 HTML 标签的意外匹配
+            if (innerText.includes('<') || innerText.includes('>')) return match;
+            return `<span class="clickable-quote" onclick="highlightInPassage(this.innerText)">"${innerText}"</span>`;
+        });
+
+        // 拼接 HTML，加入交互提示
+        qHtml += `
+            <div class="explanation-box" id="exp_${id}_${index}">
+                <div class="correct-ans">【官方答案】<br>${q.answer.replace(/\n/g, '<br>')}</div>
+                <div style="margin-top:12px; line-height: 2;">
+                    <strong>【深度解析】</strong> 
+                    <span style="font-size:12px; color:#e91e63; margin-left:10px; background:#fce4ec; padding:2px 6px; border-radius:4px;">
+                        👆 互动提示：点击下方解析中带"引号"的词句，左侧原文会自动高亮定位！
+                    </span><br>
+                    ${expHtml}
+                </div>
+            </div>
+        `;
+        card.innerHTML = qHtml;
+        qContainer.appendChild(card);
+    });
+
+    if (data.questions.length > 0) showTemplateForQuestion(0);
+    else document.getElementById('guide-content').innerHTML = `<p style="color:#999;font-size:12px;">当前文章暂无题目。</p>`;
+
+    loadAudioFromDB(id);
+}
+
+function showTemplateForTag(tag) {
+    const match = matchTemplate(tag); 
+    if (match) renderGuidePanel(match);
+}
+
+function showTemplateForQuestion(index) {
+    const data = activeDb.find(item => item.id === currentPassageId);
+    if (data.questions[index] && data.questions[index].matchedTemplate) renderGuidePanel(data.questions[index].matchedTemplate);
+}
+
+function renderGuidePanel(match) {
+    const guideContent = document.getElementById('guide-content');
+    const catData = TemplateLibrary[match.category];
+    const subData = match.template;
+
+    let stepsHtml = ''; subData.steps.forEach((step, idx) => { stepsHtml += `<li><strong>步骤${idx + 1}：</strong>${step}</li>`; });
+    let checkHtml = ''; subData.checkPoints.forEach(cp => { checkHtml += `<div class="check-item">${cp}</div>`; });
+
+    guideContent.innerHTML = `
+        <div class="thinking-flow"><h4>🧭 四意识做题流程</h4>
+            <div class="flow-step"><span class="arrow">①</span> <strong>文体意识</strong>：先判断文章文体，确定阅读重点</div>
+            <div class="flow-step"><span class="arrow">②</span> <strong>语境意识</strong>：将题目放回上下文，理解具体语境</div>
+            <div class="flow-step"><span class="arrow">③</span> <strong>文本意识</strong>：答案从原文中找，有理有据</div>
+            <div class="flow-step"><span class="arrow">④</span> <strong>题目意识</strong>：审清题意，明确答题方向</div>
+        </div>
+        <div class="template-card" style="background:${match.color}30;border-left:4px solid ${match.borderColor};">
+            <h4 style="color:${match.textColor};">${match.icon} ${match.category} · ${match.subtype}</h4>
+            <div style="color:#666;font-size:11px;margin-bottom:6px;">${catData.desc}</div>
+            <div class="formula" style="background:${match.color}60;color:${match.textColor};">📐 答题思维公式：<br>${match.formula}</div>
+        </div>
+        <div style="margin-top:10px;padding:10px;background:#f5f5f5;border-radius:6px;">
+            <h5 style="margin:0 0 8px 0;color:var(--primary-color);font-size:12px;">✅ 踩分要点检查</h5>${checkHtml}
+        </div>
+    `;
+}
+
+function showExplanations() {
+    const data = activeDb.find(item => item.id === currentPassageId);
+    data.questions.forEach((q, index) => {
+        const expBox = document.getElementById(`exp_${currentPassageId}_${index}`);
+        if (expBox) expBox.classList.add('show');
+    });
+}
+
+function openTemplateLib() {
+    const modal = document.getElementById('template-modal');
+    const body = document.getElementById('modal-body');
+    body.innerHTML = '';
+    Object.entries(TemplateLibrary).forEach(([catName, catData]) => {
+        const block = document.createElement('div'); block.className = 'category-block';
+        const header = document.createElement('div'); header.className = 'category-header';
+        header.style.background = `linear-gradient(135deg, ${catData.color} 0%, ${catData.color}99 100%)`; header.style.color = catData.textColor;
+        header.innerHTML = `<span>${catData.icon} ${catName} — ${catData.desc}</span> <span>▼</span>`;
+        header.onclick = () => { const list = block.querySelector('.subtype-list'); list.classList.toggle('open'); header.querySelector('span:last-child').innerText = list.classList.contains('open') ? '▲' : '▼'; };
+        const list = document.createElement('div'); list.className = 'subtype-list';
+        Object.entries(catData.subtypes).forEach(([subName, subData]) => {
+            const item = document.createElement('div'); item.className = 'subtype-item'; item.style.borderLeftColor = catData.borderColor;
+            const stepsText = subData.steps.map((s, i) => `${i + 1}. ${s}`).join('<br>');
+            const checkText = subData.checkPoints.map(cp => `☐ ${cp}`).join('<br>');
+            item.innerHTML = `<h5>${subName}</h5><div class="formula" style="color:${catData.textColor};">📐 公式：${subData.formula || '见具体题目'}</div><div class="steps">${stepsText}</div><div class="tips">💡 ${subData.tips}</div><div style="margin-top:6px;font-size:11px;color:#888;">踩分点：${checkText}</div>`;
+            list.appendChild(item);
+        });
+        block.appendChild(header); block.appendChild(list); body.appendChild(block);
+    });
+    modal.classList.add('show');
+}
+function closeTemplateLib() { document.getElementById('template-modal').classList.remove('show'); }
+document.getElementById('template-modal').addEventListener('click', function(e) { if (e.target === this) closeTemplateLib(); });
+
+// ============================================================
+// 智能互动：点击解析中的引文，左侧原文自动高亮定位
+// ============================================================
+function highlightInPassage(clickedText) {
+    // 1. 去除两端的引号和省略号，提取纯净的搜索词
+    let keyword = clickedText.replace(/^["""''\s。….]+|["""''\s。….]+$/g, '').trim();
+    if (!keyword) return;
+
+    // 2. 获取当前文章的原始干净文本
+    const data = activeDb.find(item => item.id === currentPassageId);
+    if (!data) return;
+
+    // 重置正文和标题的原始 HTML（保留原本 markdown 的高亮 <mark> 标签）
+    let contentHtml = data.text.replace(/==(.*?)==/g, '<mark>$1</mark>');
+    let titleHtml = data.title;
+
+    // 3. 转义正则特殊字符，防止报错
+    const safeKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // 4. 智能判断：如果字数 <= 6，当做关键词标红；否则当做句子标黄
+    const highlightClass = keyword.length <= 6 ? 'hl-keyword' : 'hl-sentence';
+
+    // 5. 构造正则：使用负向先行断言 (?![^<]*>)，防止错误匹配替换掉 HTML 标签内部的属性
+    const regex = new RegExp(`(?![^<]*>)(${safeKeyword})`, 'gi');
+
+    // 6. 执行替换并渲染到左侧
+    let matchFound = false;
+    if (regex.test(contentHtml) || regex.test(titleHtml)) {
+        matchFound = true;
+        contentHtml = contentHtml.replace(regex, `<span class="${highlightClass}">$1</span>`);
+        titleHtml = titleHtml.replace(regex, `<span class="${highlightClass}">$1</span>`);
+    }
+
+    document.getElementById('passage-content').innerHTML = contentHtml;
+    document.getElementById('passage-title').innerHTML = titleHtml;
+
+    // 7. 自动滚动定位到第一个高亮处
+    if (matchFound) {
+        const firstHl = document.querySelector(`.${highlightClass}`);
+        if (firstHl) {
+            firstHl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    } else {
+        // 如果因为省略号等原因没完全匹配上，给个友好提示
+        // alert('未能在原文中完全匹配到该原句，可能存在删减或标点差异。');
+    }
+}
+
+// ============================================================
+// 录音与本地存储 (IndexedDB) 功能
+// ============================================================
+let mediaRecorder; let audioChunks = []; let isRecording = false; let currentAudioBlob = null; let audioDB;
+const dbRequest = indexedDB.open("ReadingAudioDB", 1);
+dbRequest.onupgradeneeded = (e) => { audioDB = e.target.result; if (!audioDB.objectStoreNames.contains("audios")) audioDB.createObjectStore("audios"); };
+dbRequest.onsuccess = (e) => { audioDB = e.target.result; };
+dbRequest.onerror = (e) => { console.error("数据库打开失败", e); };
+
+async function toggleRecording() {
+    const btnRecord = document.getElementById('btn-record');
+    if (isRecording) { mediaRecorder.stop(); return; }
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream); audioChunks = [];
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+            currentAudioBlob = new Blob(audioChunks, { type: 'audio/webm' }); saveAudioToDB(currentPassageId, currentAudioBlob); showAudioUI(currentAudioBlob);
+            stream.getTracks().forEach(track => track.stop()); isRecording = false;
+            btnRecord.innerText = "🎤 重新录音"; btnRecord.classList.remove('recording-pulse');
+        };
+        mediaRecorder.start(); isRecording = true; btnRecord.innerText = "⏹ 停止录音"; btnRecord.classList.add('recording-pulse');
+        document.getElementById('audio-playback').style.display = 'none'; document.getElementById('btn-download-audio').style.display = 'none'; document.getElementById('btn-delete-audio').style.display = 'none';
+    } catch (err) { alert("无法访问麦克风，请确保已在浏览器中授予麦克风权限！\n(如果使用的是本地文件 file:// 协议，建议通过 localhost 运行)"); }
+}
+
+function showAudioUI(blob) {
+    const audioEl = document.getElementById('audio-playback'); audioEl.src = URL.createObjectURL(blob); audioEl.style.display = 'block';
+    document.getElementById('btn-download-audio').style.display = 'block'; document.getElementById('btn-delete-audio').style.display = 'block'; document.getElementById('btn-record').innerText = "🎤 重新录音";
+}
+
+function downloadAudio() {
+    if (!currentAudioBlob) return; const url = URL.createObjectURL(currentAudioBlob); const a = document.createElement('a'); a.style.display = 'none'; a.href = url;
+    a.download = `录音_${document.getElementById('passage-title').innerText.replace(/[\\/:*?"<>|]/g, '')}.webm`; document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url);
+}
+
+function deleteAudio() {
+    if (!confirm("确定要删除这篇阅读的录音吗？")) return;
+    const transaction = audioDB.transaction(["audios"], "readwrite"); const store = transaction.objectStore("audios"); store.delete(currentPassageId);
+    currentAudioBlob = null; document.getElementById('audio-playback').style.display = 'none'; document.getElementById('audio-playback').src = '';
+    document.getElementById('btn-download-audio').style.display = 'none'; document.getElementById('btn-delete-audio').style.display = 'none'; document.getElementById('btn-record').innerText = "🎤 一键录音";
+}
+
+function saveAudioToDB(passageId, blob) { if (!audioDB) return; const transaction = audioDB.transaction(["audios"], "readwrite"); const store = transaction.objectStore("audios"); store.put(blob, passageId); }
+function loadAudioFromDB(passageId) {
+    if (!audioDB) return;
+    document.getElementById('audio-playback').style.display = 'none'; document.getElementById('btn-download-audio').style.display = 'none'; document.getElementById('btn-delete-audio').style.display = 'none'; document.getElementById('btn-record').innerText = "🎤 一键录音";
+    currentAudioBlob = null;
+    const transaction = audioDB.transaction(["audios"], "readonly"); const store = transaction.objectStore("audios"); const request = store.get(passageId);
+    request.onsuccess = (e) => { if (e.target.result) { currentAudioBlob = e.target.result; showAudioUI(currentAudioBlob); } };
+}
+// ============================================================
+// 🚀 新增：自动从服务器（GitHub Pages）加载 MD 和 JSON 数据
+// ============================================================
+async function autoLoadData() {
+    // 将提示区域改成加载中状态
+    const placeholder = document.getElementById('placeholder');
+    if(placeholder) placeholder.innerHTML = "⏳ 正在自动从服务器加载题库与解析数据，请稍候...";
+
+
+// 1. 基础题库文件列表 (根目录，对应截图【语文_阅读刷题带解析】)
+    const baseFiles = [
+    "2023邂逅外星人.md",
+    "2025春江水暖鸭先知.md",
+    "2025年春江水暖鸭先知.md",
+    "2026空中杂货铺.md",
+    "宝山区_一模阅读题_分类考点高亮_答案版.md",
+    "崇明区_一模阅读题_分类考点高亮_答案版.md",
+    "打野.md",
+    "奉贤区_一模阅读题_分类考点高亮_答案版.md",
+    "父亲和我.md",
+    "鼓书艺人.md",
+    "虹口区_一模阅读题_分类考点高亮_答案版.md",
+    "黄浦区_一模阅读题_分类考点高亮_答案版.md",
+    "嘉定区_一模阅读题_分类考点高亮_答案版.md",
+    "金山区_一模阅读题_分类考点高亮_答案版.md",
+    "静安区_一模阅读题_分类考点高亮_答案版.md",
+    "楼下的邻居.md",
+    "闵行区_一模阅读题_分类考点高亮_答案版.md",
+    "泡菜坛子.md",
+    "浦东新区_一模阅读题_分类考点高亮_答案版.md",
+    "普陀区_一模阅读题_分类考点高亮_答案版.md",
+    "青浦区_一模阅读题_分类考点高亮_答案版.md",
+    "认错.md",
+    "松江区_一模阅读题_分类考点高亮_答案版.md",
+    "偷剩梅.md",
+    "星星维修师.md",
+    "徐汇区_一模阅读题_分类考点高亮_答案版.md",
+    "杨浦区_一模阅读题_分类考点高亮_答案版.md",
+    "斩生活记.md",
+    "长宁区_一模阅读题_分类考点高亮_答案版.md"  // 深度解析中有，一并加入
+];
+
+// 2. 补充数据文件列表 (对应截图【深度解析】+ JSON)
+    const supplementaryFiles = [
+    "语文阅读题库_带层次拆解.json",
+    "深度解析/2023邂逅外星人.md",
+    "深度解析/2025春江水暖鸭先知.md",
+    "深度解析/2025年春江水暖鸭先知.md",
+    "深度解析/2026空中杂货铺.md",
+    "深度解析/宝山区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/崇明区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/打野.md",
+    "深度解析/奉贤区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/父亲和我.md",
+    "深度解析/鼓书艺人.md",
+    "深度解析/虹口区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/黄浦区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/嘉定区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/金山区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/静安区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/楼下的邻居.md",
+    "深度解析/闵行区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/泡菜坛子.md",
+    "深度解析/浦东新区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/普陀区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/青浦区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/认错.md",
+    "深度解析/松江区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/偷剩梅.md",
+    "深度解析/星星维修师.md",
+    "深度解析/徐汇区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/杨浦区_一模阅读题_分类考点高亮_答案版.md",
+    "深度解析/斩生活记.md",
+    "深度解析/长宁区_一模阅读题_分类考点高亮_答案版.md"
+];
+    rawDb = [];
+    selectedMajorCategory = null;
+    globalIdCounter = 1;
+
+    // ---------- 第一阶段：静默拉取基础数据 ----------
+    for (const fileName of baseFiles) {
+        try {
+            const response = await fetch(fileName);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            const content = await response.text();
+            
+            // 提取文件名前缀（模拟手动上传时的文件名提取逻辑）
+            const districtName = fileName.split('/').pop().split('_')[0].replace(/\.(md|txt|json)$/i, '');
+
+            if (fileName.endsWith('.md') || fileName.endsWith('.txt')) {
+                parseMarkdown(content, districtName);
+            } else if (fileName.endsWith('.json')) {
+                parseJSON(content, districtName);
+            }
+        } catch (err) {
+            console.error(`❌ 基础文件 ${fileName} 加载失败:`, err);
+        }
+    }
+
+    // ---------- 运行核心去重与合并逻辑 ----------
+    let uniqueDbMap = new Map();
+    rawDb.forEach(item => {
+        let core = getCoreTitle(item.title);
+        if (uniqueDbMap.has(core)) {
+            let existing = uniqueDbMap.get(core);
+            if ((!existing.hierarchy_analysis || existing.hierarchy_analysis.length === 0) && (item.hierarchy_analysis && item.hierarchy_analysis.length > 0)) {
+                existing.hierarchy_analysis = item.hierarchy_analysis;
+            }
+            if (!existing.text && item.text) existing.text = item.text;
+            if (existing.questions.length === 0 && item.questions.length > 0) existing.questions = item.questions;
+            if (item.genre && existing.majorCategory === "未分类") {
+                existing.genre = item.genre;
+                existing.majorCategory = classifyGenre(item.genre);
+            }
+        } else {
+            uniqueDbMap.set(core, item);
+        }
+    });
+
+    rawDb = Array.from(uniqueDbMap.values()).filter(item => item.questions && item.questions.length > 0);
+
+    // ---------- 第二阶段：静默拉取并覆盖深度解析/层次数据 ----------
+    let jsonMatchCount = 0;
+    let mdMatchCount = 0;
+
+    for (const fileName of supplementaryFiles) {
+         try {
+            const response = await fetch(fileName);
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+            const content = await response.text();
+            
+            if (fileName.endsWith('.json')) {
+                const data = JSON.parse(content);
+                const articles = Array.isArray(data) ? data : (data.articles || []);
+                articles.forEach(art => {
+                    if (art.hierarchy_analysis && art.hierarchy_analysis.length > 0) {
+                        const coreTitle = getCoreTitle(art.title);
+                        const matchedItem = rawDb.find(dbItem => getCoreTitle(dbItem.title) === coreTitle);
+                        if (matchedItem) {
+                            matchedItem.hierarchy_analysis = art.hierarchy_analysis;
+                            jsonMatchCount++;
+                        }
+                    }
+                });
+            } else if (fileName.endsWith('.md') || fileName.endsWith('.txt')) {
+                const articles = content.split('## 文章：');
+                articles.shift();
+                articles.forEach(art => {
+                    const firstNewline = art.indexOf('\n');
+                    const title = art.substring(0, firstNewline).trim();
+                    const coreTitle = getCoreTitle(title);
+                    const matchedItem = rawDb.find(dbItem => getCoreTitle(dbItem.title) === coreTitle);
+
+                    if (matchedItem) {
+                        mdMatchCount++;
+                        const sections = art.split(/---\s*\n/).filter(s => s.trim().length > 0);
+                        let qIndex = 0;
+                        for (let i = 1; i < sections.length; i++) {
+                            const sec = sections[i].trim();
+                            if (!sec) continue;
+                            const expMatch = sec.match(/> \*\*解析\*\*：([\s\S]*)$/);
+                            if (expMatch && matchedItem.questions[qIndex]) {
+                                // 完美覆盖深度解析
+                                matchedItem.questions[qIndex].explanation = cleanMarkdownSyntax(expMatch[1]);
+                            }
+                            qIndex++;
+                        }
+                    }
+                });
+            }
+        } catch (err) {
+            console.error(`❌ 补充文件 ${fileName} 加载失败:`, err);
+        }
+    }
+
+    // ---------- 重新计算仪表盘统计并渲染 ----------
+    allTagsMap = {};
+    allTagsScoreMap = {};
+    rawDb.forEach(item => {
+        item.questions.forEach(q => {
+            q.tags.forEach(t => {
+                allTagsMap[t] = (allTagsMap[t] || 0) + 1;
+                allTagsScoreMap[t] = (allTagsScoreMap[t] || 0) + q.score;
+            });
+        });
+    });
+
+    if (rawDb.length > 0) {
+        if(placeholder) placeholder.style.display = 'none';
+        renderDashboard();
+        console.log(`✅ 自动加载完毕：找到 ${rawDb.length} 篇文章，成功关联层次拆解 ${jsonMatchCount} 篇，关联深度解析 ${mdMatchCount} 篇`);
+    } else {
+        if(placeholder) placeholder.innerHTML = '❌ 自动加载完成，但未找到有效题目，请检查控制台文件路径是否填写正确。';
+    }
+}
+
+// 监听页面加载完毕，立即触发自动拉取
+window.addEventListener('DOMContentLoaded', autoLoadData);
+</script>
 </body>
 </html>

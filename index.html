@@ -17,7 +17,7 @@
             --success-color: #4caf50;
             --warning-color: #ff9800;
             --tag-bg: #e8eaf6;
-            --tag-color: #3f51b5;
+            --tag-color: #3f51b5;// 🚀 核心升级：载入补充数据
             --literary-color: #e91e63;
             --literary-bg: #fce4ec;
             --practical-color: #009688;
@@ -1058,6 +1058,7 @@ document.getElementById('fileInput').addEventListener('change', async function(e
 
 
 // ============================================================
+// ============================================================
 // 🚀 核心升级：载入补充数据 (同时支持 层次JSON 和 深度解析MD)
 // ============================================================
 document.getElementById('hierarchyInput').addEventListener('change', async function(e) {
@@ -1078,14 +1079,19 @@ document.getElementById('hierarchyInput').addEventListener('change', async funct
             const data = JSON.parse(content);
             const articles = Array.isArray(data) ? data : (data.articles || []);
             articles.forEach(art => {
-                if (art.hierarchy_analysis && art.hierarchy_analysis.length > 0) {
-                    const coreTitle = getCoreTitle(art.title);
+                // 🌟 核心修复：兼容“hierarchy_analysis”和“层次拆解”两种命名
+                const analysisData = art.hierarchy_analysis || art.层次拆解 || [];
+                if (analysisData && analysisData.length > 0) {
+                    // 🌟 核心修复：兼容“title”和“标题”两种命名
+                    const artTitle = art.title || art.标题 || art.article_title || "";
+                    const coreTitle = getCoreTitle(artTitle);
+                    
                     const matchedItem = rawDb.find(dbItem => getCoreTitle(dbItem.title) === coreTitle);
                     if (matchedItem) {
-                        matchedItem.hierarchy_analysis = art.hierarchy_analysis;
+                        matchedItem.hierarchy_analysis = analysisData;
                         jsonMatchCount++;
                         const activeItem = activeDb.find(a => a.id === matchedItem.id);
-                        if (activeItem) activeItem.hierarchy_analysis = art.hierarchy_analysis;
+                        if (activeItem) activeItem.hierarchy_analysis = analysisData;
                     }
                 }
             });
@@ -1118,10 +1124,7 @@ document.getElementById('hierarchyInput').addEventListener('change', async funct
                     // 提取 AI 生成的深度解析
                     const expMatch = sec.match(/> \*\*解析\*\*：([\s\S]*)$/);
                     if (expMatch && matchedItem.questions[qIndex]) {
-                        // 将新的深度解析覆盖进去
                         matchedItem.questions[qIndex].explanation = cleanMarkdownSyntax(expMatch[1]);
-
-                        // 同步给活跃队列
                         const activeItem = activeDb.find(a => a.id === matchedItem.id);
                         if (activeItem && activeItem.questions[qIndex]) {
                             activeItem.questions[qIndex].explanation = cleanMarkdownSyntax(expMatch[1]);
@@ -1311,7 +1314,7 @@ function loadPassage(id) {
         btnToggle.disabled = true;
         btnToggle.style.background = '#cccccc';
         btnToggle.style.cursor = 'not-allowed';
-        btnToggle.innerText = '📑 暂无层次拆解';
+        btnToggle.innerHTML = '📄 暂无层次拆解';
         hContainer.innerHTML = '';
         hContainer.style.display = 'none';
     }
@@ -1339,29 +1342,26 @@ function loadPassage(id) {
             qHtml += `<textarea class="essay-input" placeholder="请在此构思你的答案...\n（点击上方考点标签可查看细分题型模板和答题公式）"></textarea>`;
         }
 
-        // 将解析中的换行转换为 <br>
-        let expHtml = q.explanation.replace(/\n/g, '<br>');
-
-        // 🚀 核心魔改：使用正则抓取解析中所有被中文双引号 " " 包裹的内容，变成可点击的 span！
-        expHtml = expHtml.replace(/"([^"]+)"/g, function(match, innerText) {
-            // 排除含有 HTML 标签的意外匹配
+        // 🚀 核心改动：仅保留官方答案和深度解析
+        qHtml += `
+            <div class="explanation-box" id="exp_${id}_${index}">
+                <div class="correct-ans">【官方答案】<br>${q.answer.replace(/\n/g, '<br>')}</div>
+                <div style="margin-top:12px;">
+                    <strong>【深度解析】</strong>
+                    <span style="font-size:12px; color:#e91e63; margin-left:10px; background:#fce4ec; padding:2px 6px; border-radius:4px;">
+                        👆 互动提示：点击下方解析中带"引号"的词句，左侧原文会自动高亮定位！
+                    </span><br>
+                    ${q.explanation.replace(/\n/g, '<br>')}
+                </div>
+            </div>
+        `;
+        
+        // 绑定点击引用的正则
+        qHtml = qHtml.replace(/"([^"]+)"/g, function(match, innerText) {
             if (innerText.includes('<') || innerText.includes('>')) return match;
             return `<span class="clickable-quote" onclick="highlightInPassage(this.innerText)">"${innerText}"</span>`;
         });
 
-        // 拼接 HTML，加入交互提示
-        qHtml += `
-            <div class="explanation-box" id="exp_${id}_${index}">
-                <div class="correct-ans">【官方答案】<br>${q.answer.replace(/\n/g, '<br>')}</div>
-                <div style="margin-top:12px; line-height: 2;">
-                    <strong>【深度解析】</strong> 
-                    <span style="font-size:12px; color:#e91e63; margin-left:10px; background:#fce4ec; padding:2px 6px; border-radius:4px;">
-                        👆 互动提示：点击下方解析中带"引号"的词句，左侧原文会自动高亮定位！
-                    </span><br>
-                    ${expHtml}
-                </div>
-            </div>
-        `;
         card.innerHTML = qHtml;
         qContainer.appendChild(card);
     });
@@ -1445,28 +1445,18 @@ document.getElementById('template-modal').addEventListener('click', function(e) 
 // 智能互动：点击解析中的引文，左侧原文自动高亮定位
 // ============================================================
 function highlightInPassage(clickedText) {
-    // 1. 去除两端的引号和省略号，提取纯净的搜索词
     let keyword = clickedText.replace(/^["""''\s。….]+|["""''\s。….]+$/g, '').trim();
     if (!keyword) return;
 
-    // 2. 获取当前文章的原始干净文本
     const data = activeDb.find(item => item.id === currentPassageId);
     if (!data) return;
 
-    // 重置正文和标题的原始 HTML（保留原本 markdown 的高亮 <mark> 标签）
     let contentHtml = data.text.replace(/==(.*?)==/g, '<mark>$1</mark>');
     let titleHtml = data.title;
-
-    // 3. 转义正则特殊字符，防止报错
     const safeKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-    // 4. 智能判断：如果字数 <= 6，当做关键词标红；否则当做句子标黄
     const highlightClass = keyword.length <= 6 ? 'hl-keyword' : 'hl-sentence';
-
-    // 5. 构造正则：使用负向先行断言 (?![^<]*>)，防止错误匹配替换掉 HTML 标签内部的属性
     const regex = new RegExp(`(?![^<]*>)(${safeKeyword})`, 'gi');
 
-    // 6. 执行替换并渲染到左侧
     let matchFound = false;
     if (regex.test(contentHtml) || regex.test(titleHtml)) {
         matchFound = true;
@@ -1477,15 +1467,9 @@ function highlightInPassage(clickedText) {
     document.getElementById('passage-content').innerHTML = contentHtml;
     document.getElementById('passage-title').innerHTML = titleHtml;
 
-    // 7. 自动滚动定位到第一个高亮处
     if (matchFound) {
         const firstHl = document.querySelector(`.${highlightClass}`);
-        if (firstHl) {
-            firstHl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    } else {
-        // 如果因为省略号等原因没完全匹配上，给个友好提示
-        // alert('未能在原文中完全匹配到该原句，可能存在删减或标点差异。');
+        if (firstHl) firstHl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 }
 
@@ -1540,94 +1524,89 @@ function loadAudioFromDB(passageId) {
     const transaction = audioDB.transaction(["audios"], "readonly"); const store = transaction.objectStore("audios"); const request = store.get(passageId);
     request.onsuccess = (e) => { if (e.target.result) { currentAudioBlob = e.target.result; showAudioUI(currentAudioBlob); } };
 }
+
 // ============================================================
 // 🚀 新增：自动从服务器（GitHub Pages）加载 MD 和 JSON 数据
 // ============================================================
 async function autoLoadData() {
-    // 将提示区域改成加载中状态
     const placeholder = document.getElementById('placeholder');
     if(placeholder) placeholder.innerHTML = "⏳ 正在自动从服务器加载题库与解析数据，请稍候...";
 
-
-// 1. 基础题库文件列表 (根目录，对应截图【语文_阅读刷题带解析】)
     const baseFiles = [
-    "语文_阅读刷题带解析/2023邂逅外星人.md",
-    "语文_阅读刷题带解析/2025春江水暖鸭先知.md",
-    "语文_阅读刷题带解析/2025年春江水暖鸭先知.md",
-    "语文_阅读刷题带解析/2026空中杂货铺.md",
-    "语文_阅读刷题带解析/宝山区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/崇明区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/打野.md",
-    "语文_阅读刷题带解析/奉贤区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/父亲和我.md",
-    "语文_阅读刷题带解析/鼓书艺人.md",
-    "语文_阅读刷题带解析/虹口区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/黄浦区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/嘉定区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/金山区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/静安区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/楼下的邻居.md",
-    "语文_阅读刷题带解析/闵行区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/泡菜坛子.md",
-    "语文_阅读刷题带解析/浦东新区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/普陀区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/青浦区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/认错.md",
-    "语文_阅读刷题带解析/松江区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/偷剩梅.md",
-    "语文_阅读刷题带解析/星星维修师.md",
-    "语文_阅读刷题带解析/徐汇区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/杨浦区_一模阅读题_分类考点高亮_答案版.md",
-    "语文_阅读刷题带解析/斩生活记.md",
-    "语文_阅读刷题带解析/长宁区_一模阅读题_分类考点高亮_答案版.md",  // 深度解析中有，一并加入
-    "语文_阅读刷题带解析/语文阅读题库_带层次拆解.json",
-    "语文_阅读刷题带解析/嘉定区_一模阅读题_分类考点高亮_答案版.json",
-];
+        "语文_阅读刷题带解析/2023邂逅外星人.md",
+        "语文_阅读刷题带解析/2025春江水暖鸭先知.md",
+        "语文_阅读刷题带解析/2025年春江水暖鸭先知.md",
+        "语文_阅读刷题带解析/2026空中杂货铺.md",
+        "语文_阅读刷题带解析/宝山区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/崇明区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/打野.md",
+        "语文_阅读刷题带解析/奉贤区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/父亲和我.md",
+        "语文_阅读刷题带解析/鼓书艺人.md",
+        "语文_阅读刷题带解析/虹口区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/黄浦区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/嘉定区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/金山区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/静安区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/楼下的邻居.md",
+        "语文_阅读刷题带解析/闵行区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/泡菜坛子.md",
+        "语文_阅读刷题带解析/浦东新区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/普陀区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/青浦区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/认错.md",
+        "语文_阅读刷题带解析/松江区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/偷剩梅.md",
+        "语文_阅读刷题带解析/星星维修师.md",
+        "语文_阅读刷题带解析/徐汇区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/杨浦区_一模阅读题_分类考点高亮_答案版.md",
+        "语文_阅读刷题带解析/斩生活记.md",
+        "语文_阅读刷题带解析/长宁区_一模阅读题_分类考点高亮_答案版.md"
+    ];
 
-// 2. 补充数据文件列表 (对应截图【深度解析】+ JSON)
     const supplementaryFiles = [
-    "深度解析/2023邂逅外星人.md",
-    "深度解析/2025春江水暖鸭先知.md",
-    "深度解析/2025年春江水暖鸭先知.md",
-    "深度解析/2026空中杂货铺.md",
-    "深度解析/宝山区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/崇明区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/打野.md",
-    "深度解析/奉贤区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/父亲和我.md",
-    "深度解析/鼓书艺人.md",
-    "深度解析/虹口区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/黄浦区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/嘉定区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/金山区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/静安区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/楼下的邻居.md",
-    "深度解析/闵行区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/泡菜坛子.md",
-    "深度解析/浦东新区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/普陀区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/青浦区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/认错.md",
-    "深度解析/松江区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/偷剩梅.md",
-    "深度解析/星星维修师.md",
-    "深度解析/徐汇区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/杨浦区_一模阅读题_分类考点高亮_答案版.md",
-    "深度解析/斩生活记.md",
-    "深度解析/长宁区_一模阅读题_分类考点高亮_答案版.md"
-];
+        "语文_阅读刷题带解析/语文阅读题库_带层次拆解.json",
+        "深度解析/2023邂逅外星人.md",
+        "深度解析/2025春江水暖鸭先知.md",
+        "深度解析/2025年春江水暖鸭先知.md",
+        "深度解析/2026空中杂货铺.md",
+        "深度解析/宝山区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/崇明区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/打野.md",
+        "深度解析/奉贤区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/父亲和我.md",
+        "深度解析/鼓书艺人.md",
+        "深度解析/虹口区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/黄浦区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/嘉定区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/金山区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/静安区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/楼下的邻居.md",
+        "深度解析/闵行区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/泡菜坛子.md",
+        "深度解析/浦东新区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/普陀区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/青浦区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/认错.md",
+        "深度解析/松江区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/偷剩梅.md",
+        "深度解析/星星维修师.md",
+        "深度解析/徐汇区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/杨浦区_一模阅读题_分类考点高亮_答案版.md",
+        "深度解析/斩生活记.md",
+        "深度解析/长宁区_一模阅读题_分类考点高亮_答案版.md"
+    ];
+
     rawDb = [];
     selectedMajorCategory = null;
     globalIdCounter = 1;
 
-    // ---------- 第一阶段：静默拉取基础数据 ----------
     for (const fileName of baseFiles) {
         try {
             const response = await fetch(fileName);
             if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
             const content = await response.text();
             
-            // 提取文件名前缀（模拟手动上传时的文件名提取逻辑）
             const districtName = fileName.split('/').pop().split('_')[0].replace(/\.(md|txt|json)$/i, '');
 
             if (fileName.endsWith('.md') || fileName.endsWith('.txt')) {
@@ -1640,7 +1619,6 @@ async function autoLoadData() {
         }
     }
 
-    // ---------- 运行核心去重与合并逻辑 ----------
     let uniqueDbMap = new Map();
     rawDb.forEach(item => {
         let core = getCoreTitle(item.title);
@@ -1662,7 +1640,6 @@ async function autoLoadData() {
 
     rawDb = Array.from(uniqueDbMap.values()).filter(item => item.questions && item.questions.length > 0);
 
-    // ---------- 第二阶段：静默拉取并覆盖深度解析/层次数据 ----------
     let jsonMatchCount = 0;
     let mdMatchCount = 0;
 
@@ -1676,11 +1653,14 @@ async function autoLoadData() {
                 const data = JSON.parse(content);
                 const articles = Array.isArray(data) ? data : (data.articles || []);
                 articles.forEach(art => {
-                    if (art.hierarchy_analysis && art.hierarchy_analysis.length > 0) {
-                        const coreTitle = getCoreTitle(art.title);
+                    // 🌟 增强兼容性：兼容“hierarchy_analysis”和“层次拆解”两种命名
+                    const analysisData = art.hierarchy_analysis || art.层次拆解 || [];
+                    if (analysisData && analysisData.length > 0) {
+                        const artTitle = art.title || art.标题 || art.article_title || "";
+                        const coreTitle = getCoreTitle(artTitle);
                         const matchedItem = rawDb.find(dbItem => getCoreTitle(dbItem.title) === coreTitle);
                         if (matchedItem) {
-                            matchedItem.hierarchy_analysis = art.hierarchy_analysis;
+                            matchedItem.hierarchy_analysis = analysisData;
                             jsonMatchCount++;
                         }
                     }
@@ -1703,7 +1683,6 @@ async function autoLoadData() {
                             if (!sec) continue;
                             const expMatch = sec.match(/> \*\*解析\*\*：([\s\S]*)$/);
                             if (expMatch && matchedItem.questions[qIndex]) {
-                                // 完美覆盖深度解析
                                 matchedItem.questions[qIndex].explanation = cleanMarkdownSyntax(expMatch[1]);
                             }
                             qIndex++;
@@ -1716,7 +1695,6 @@ async function autoLoadData() {
         }
     }
 
-    // ---------- 重新计算仪表盘统计并渲染 ----------
     allTagsMap = {};
     allTagsScoreMap = {};
     rawDb.forEach(item => {
@@ -1737,7 +1715,6 @@ async function autoLoadData() {
     }
 }
 
-// 监听页面加载完毕，立即触发自动拉取
 window.addEventListener('DOMContentLoaded', autoLoadData);
 </script>
 </body>
